@@ -44,7 +44,7 @@
   {
     "id": "room_003",
     "title": "Premium 2BHK Family Flat",
-    "price": 1500,
+    "price": 1900,
     "city": "Bangalore",
     "gender": "Family",
     "roomType": "Flat",
@@ -57,7 +57,7 @@
     "amenities": ["Lift", "Car Parking", "Balcony", "Gym", "Gas Pipeline"],
     "address": "B-704, Green Glen Layout, Outer Ring Road, Bangalore - 560103",
     "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.6254425880457!2d77.67732297583344!3d12.931751015754897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae13bcbebcffff%3A0xbc4e578f14b6099b!2sGreen%20Glen%20Layout!5e0!3m2!1sen!2sin!4v1710000000002!5m2!1sen!2sin",
-    "ownerName": "Suresh Murthy",
+    "ownerName": "Swati",
     "phone": "+919579648610",
     "whatsapp": "919579648610",
     "dateAdded": "2026-07-04"
