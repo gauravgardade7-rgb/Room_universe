@@ -1,0 +1,1097 @@
+/* ==========================================================================
+   PRODUCTION READY CENTRAL CSS ARCHITECTURE STYLESHEET WITH LIGHT / DARK DESIGN TOKENS
+   ========================================================================== */
+
+:root {
+    /* Fluid Light Theme Color Palettes Variables Tokens Base Setup */
+    --bg-main: #f8fafc;
+    --bg-surface: #ffffff;
+    --bg-surface-alt: #f1f5f9;
+    --border-color: #e2e8f0;
+    
+    --text-primary: #0f172a;
+    --text-muted: #475569;
+    --text-inverse: #ffffff;
+
+    --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%);
+    --primary-color: #4f46e5;
+    --accent-color: #10b981;
+    --accent-warn: #f59e0b;
+    --accent-danger: #ef4444;
+    
+    --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+    --shadow-md: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.08);
+    --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.12), 0 10px 10px -5px rgba(15, 23, 42, 0.04);
+    
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    
+    --transition-smooth: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    --font-stack: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* Overriding Global Tokens Configuration Rules For Dark Palette Execution Matrix Schema Mode */
+[data-theme="dark"] {
+    --bg-main: #090d16;
+    --bg-surface: #131c2e;
+    --bg-surface-alt: #1e293b;
+    --border-color: #334155;
+    
+    --text-primary: #f8fafc;
+    --text-muted: #94a3b8;
+    --text-inverse: #090d16;
+    
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+}
+
+/* RESET STANDARD STYLES ELEMENT DEFAULTS OPERATIONAL MATRIX SETUP Rules Layout */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+    font-size: 16px;
+}
+
+body {
+    font-family: var(--font-stack);
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    transition: var(--transition-smooth);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+    transition: var(--transition-smooth);
+}
+
+ul {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+button, select, input {
+    font-family: inherit;
+    font-size: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+/* Accessibility screen reader helper utility class structural pattern rules framework layout */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    border: 0;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   APP INITIALIZATION LOADER CORE ELEMENT MODULE SPINNER FRAMEWORK ARCHITECTURE
+   ========================================================================== */
+.app-loader {
+    position: fixed;
+    inset: 0;
+    background-color: var(--bg-main);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid var(--border-color);
+    border-top-color: var(--primary-color);
+    border-radius: 50%;
+    animation: spinningLoaderFrameEffect 1s infinite linear;
+}
+
+@keyframes spinningLoaderFrameEffect {
+    to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   APP HEADER NAVIGATION STRUCTURE LAYOUT ARCHITECTURE MODULE DESIGN
+   ========================================================================== */
+.navbar {
+    position: sticky;
+    top: 0;
+    background-color: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border-color);
+    z-index: 1000;
+    transition: var(--transition-smooth);
+}
+
+[data-theme="dark"] .navbar {
+    background-color: rgba(19, 28, 46, 0.8);
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-logo i {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.nav-logo span {
+    color: var(--primary-color);
+}
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.nav-links a {
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0.5rem 0;
+    position: relative;
+}
+
+.nav-links a.active, .nav-links a:hover {
+    color: var(--primary-color);
+}
+
+.nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--primary-gradient);
+    transition: var(--transition-smooth);
+}
+
+.nav-links a.active::after, .nav-links a:hover::after {
+    width: 100%;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.theme-toggle-btn, .nav-fav-btn {
+    cursor: pointer;
+    padding: 0.6rem;
+    border-radius: var(--radius-sm);
+    background-color: var(--bg-surface-alt);
+    transition: var(--transition-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-fav-btn {
+    font-weight: 600;
+    padding: 0.6rem 1rem;
+    gap: 0.5rem;
+}
+
+.nav-fav-btn i {
+    color: var(--accent-danger);
+}
+
+.nav-fav-btn.active-filter {
+    background: var(--primary-gradient);
+    color: white;
+}
+.nav-fav-btn.active-filter i {
+    color: white;
+}
+
+.theme-toggle-btn:hover, .nav-fav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Responsive UI Hamburguer Overlay Navigation Menu Trigger Elements Styles Block */
+.hamburger {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.hamburger .bar {
+    width: 26px;
+    height: 3px;
+    background-color: var(--text-primary);
+    border-radius: 2px;
+    transition: var(--transition-smooth);
+}
+
+/* ==========================================================================
+   APP HERO HERO BANNER LANDING DISPLAY GRID ROW SPACE ELEMENT
+   ========================================================================== */
+.hero-section {
+    position: relative;
+    padding: 6rem 2rem;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('rooms/room1.jpg') center/cover no-repeat;
+    background-blend-mode: overlay;
+    color: white;
+    text-align: center;
+    overflow: hidden;
+}
+
+.hero-content {
+    position: relative;
+    max-width: 800px;
+    margin: 0 auto;
+    z-index: 2;
+}
+
+.hero-content h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 1.2rem;
+    letter-spacing: -1px;
+    animation: fadeInUp 0.8s ease-out;
+}
+
+.hero-content p {
+    font-size: 1.25rem;
+    color: #cbd5e1;
+    animation: fadeInUp 1s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ==========================================================================
+   CENTRAL SEARCH ENGINE AND DISCOVERY FILTER INTEGRATED DASHBOARD DASHBOARD
+   ========================================================================== */
+.main-container {
+    max-width: 1400px;
+    margin: -3rem auto 4rem auto;
+    padding: 0 2rem;
+    position: relative;
+    z-index: 10;
+}
+
+.control-panel {
+    background-color: var(--bg-surface);
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    margin-bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transition: var(--transition-smooth);
+}
+
+.search-box-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.search-box-wrapper .search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 1.2rem;
+}
+
+.search-box-wrapper input {
+    width: 100%;
+    padding: 1.1rem 1.2rem 1.1rem 3.2rem;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    transition: var(--transition-smooth);
+    font-weight: 500;
+}
+
+.search-box-wrapper input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+    background-color: var(--bg-surface);
+}
+
+.filter-group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+}
+
+.filter-box {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-box label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.filter-box select, .filter-box input[type="range"] {
+    width: 100%;
+}
+
+.filter-box select {
+    padding: 0.8rem 1rem;
+    background-color: var(--bg-main);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.filter-box select:focus {
+    border-color: var(--primary-color);
+}
+
+.range-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.range-labels span {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+/* Input Type Range Native Modern Design Normalization Setup Layout */
+.filter-box input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--border-color);
+    outline: none;
+}
+
+.filter-box input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.filter-box input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+/* ==========================================================================
+   RESULTS OUTPUT VIEW - HIGH PERFORMANCE CARD ENGINE LAYOUT ARCHITECTURE
+   ========================================================================== */
+.rooms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+}
+
+.room-card {
+    background-color: var(--bg-surface);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: var(--transition-smooth);
+    animation: cardEntranceAnimation 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes cardEntranceAnimation {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.room-card:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+    border-color: rgba(79, 70, 229, 0.3);
+}
+
+.card-media-wrapper {
+    position: relative;
+    aspect-ratio: 16 / 11;
+    overflow: hidden;
+    background-color: var(--bg-surface-alt);
+}
+
+.card-media-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.room-card:hover .card-media-wrapper img {
+    transform: scale(1.08);
+}
+
+.fav-trigger-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(4px);
+    z-index: 5;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: var(--shadow-sm);
+    color: var(--text-muted);
+    transition: var(--transition-smooth);
+}
+
+.fav-trigger-btn:hover {
+    transform: scale(1.1);
+    background-color: #ffffff;
+}
+
+.fav-trigger-btn.is-favorite i {
+    color: var(--accent-danger);
+    animation: pulseHeartEffect 0.3s ease-in-out;
+}
+
+@keyframes pulseHeartEffect {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+.badge-pill {
+    position: absolute;
+    bottom: 1rem;
+    left: 1rem;
+    padding: 0.4rem 0.8rem;
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(4px);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.card-body-content {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card-location-meta {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.card-body-content h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card-pricing-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.price-currency-block {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.price-currency-block span {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.btn {
+    cursor: pointer;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: var(--transition-smooth);
+}
+
+.btn-primary {
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover {
+    opacity: 0.95;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   PAGINATION ELEMENT INTERFACES AND EMPTY LISTING NOTIFICATIONS
+   ========================================================================== */
+.pagination-container {
+    margin-top: 4rem;
+    display: flex;
+    justify-content: center;
+}
+
+.no-results-card {
+    text-align: center;
+    padding: 5rem 2rem;
+    background-color: var(--bg-surface);
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--border-color);
+    color: var(--text-muted);
+    max-width: 600px;
+    margin: 2rem auto;
+}
+
+.no-results-card i {
+    font-size: 4rem;
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1.5rem;
+}
+
+.no-results-card h3 {
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+/* ==========================================================================
+   MODAL BACKDROP INTERACTIVE VIEW ENGINE FOR DETAILED ROOM DISPLAYS
+   ========================================================================== */
+.modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    z-index: 2000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    animation: fadeInModal 0.3s ease;
+}
+
+.modal-window {
+    background-color: var(--bg-surface);
+    width: 100%;
+    max-width: 960px;
+    max-height: 90vh;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    border: 1px solid var(--border-color);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUpModal 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes fadeInModal { from { opacity: 0; } }
+@keyframes slideUpModal { from { transform: translateY(50px); opacity: 0; } }
+
+.modal-close-btn {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--bg-surface-alt);
+    font-size: 1.75rem;
+    font-weight: 400;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: var(--transition-smooth);
+}
+
+.modal-close-btn:hover {
+    background-color: var(--accent-danger);
+    color: white;
+}
+
+.modal-body-scrollable {
+    padding: 2.5rem;
+    overflow-y: auto;
+}
+
+/* Gallery Module Layout Styles Architecture Inside Sheet Modal view */
+.gallery-engine {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.viewer-main-frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background-color: var(--bg-surface-alt);
+}
+
+.viewer-main-frame img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gallery-thumbnails-strip {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+}
+
+.gallery-thumbnails-strip img {
+    width: 90px;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: var(--transition-smooth);
+    opacity: 0.6;
+}
+
+.gallery-thumbnails-strip img.thumb-active, .gallery-thumbnails-strip img:hover {
+    border-color: var(--primary-color);
+    opacity: 1;
+    transform: translateY(-2px);
+}
+
+/* Modal Content Grid Multi-pane structural alignment definitions style layout */
+.modal-content-grid {
+    display: grid;
+    grid-template-columns: 1.6fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    margin-bottom: 2rem;
+}
+
+.badge-row {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.badge-row span {
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.badge-gender { background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+.badge-type { background-color: rgba(16, 185, 129, 0.15); color: #10b981; }
+
+.modal-window h2 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+}
+
+.modal-price-tag {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--primary-color);
+}
+
+.separator {
+    border: 0;
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 1.5rem 0;
+}
+
+.modal-content-grid h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 1.5rem 0 0.75rem 0;
+}
+
+.text-muted-body {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.amenities-tags-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.amenities-tags-grid li {
+    padding: 0.4rem 0.8rem;
+    background-color: var(--bg-surface-alt);
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--border-color);
+}
+
+.address-text-line {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+}
+
+.address-text-line i {
+    color: var(--accent-danger);
+}
+
+/* Contact Card Pane Design Elements Module Component Rule Configuration block */
+.vendor-engagement-card {
+    background-color: var(--bg-surface-alt);
+    border-radius: var(--radius-sm);
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+}
+
+.vendor-avatar-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 1rem 0 1.5rem 0;
+}
+
+.avatar-mock {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--primary-color);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.25rem;
+}
+
+.vendor-avatar-row h4 {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.vendor-avatar-row p {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.action-buttons-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.action-buttons-stack .btn {
+    width: 100%;
+    padding: 0.9rem;
+}
+
+.btn-call { background-color: #3b82f6; color: white; }
+.btn-whatsapp { background-color: #25d366; color: white; }
+.action-buttons-stack .btn:hover { opacity: 0.9; transform: translateY(-2px); }
+
+.map-iframe-wrapper {
+    margin-top: 2rem;
+}
+
+.map-iframe-wrapper h3 {
+    margin-bottom: 1rem;
+}
+
+.map-iframe-wrapper iframe {
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+}
+
+/* ==========================================================================
+   FLOATING UTILITY BUTTON MODULE HANDLERS STYLES
+   ========================================================================== */
+.back-to-top-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--primary-gradient);
+    color: white;
+    box-shadow: var(--shadow-md);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 99;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: var(--transition-smooth);
+}
+
+.back-to-top-btn.is-visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.back-to-top-btn:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ==========================================================================
+   GLOBAL STANDARDIZED CORE SYSTEM APPLICATION LAYOUT FOOTER MODULE
+   ========================================================================== */
+.app-footer {
+    background-color: #0f172a;
+    color: #94a3b8;
+    padding: 4rem 2rem 1.5rem 2rem;
+    border-top: 1px solid #1e293b;
+}
+
+[data-theme="dark"] .app-footer {
+    background-color: #05080e;
+}
+
+.footer-columns-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.5fr repeat(3, 1fr);
+    gap: 3rem;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid #1e293b;
+}
+
+.footer-brand-column .footer-logo {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.footer-brand-column .footer-logo span { color: #4f46e5; }
+.footer-brand-column p { font-size: 0.9rem; line-height: 1.6; }
+
+.footer-columns-container h4 {
+    color: white;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1.25rem;
+}
+
+.footer-links-column ul {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.footer-links-column a {
+    font-size: 0.9rem;
+}
+
+.footer-links-column a:hover {
+    color: white;
+    padding-left: 4px;
+}
+
+.footer-links-column p {
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.footer-links-column i {
+    color: #4f46e5;
+    margin-right: 0.5rem;
+}
+
+.footer-copyright-strip {
+    text-align: center;
+    max-width: 1400px;
+    margin: 1.5rem auto 0 auto;
+    font-size: 0.8rem;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN ADAPTATION MEDIA BREAKPOINT SCALABILITY ENGINE RULES
+   ========================================================================== */
+
+/* Tablet Optimization Layout Interface Matrix Mapping RULES */
+@media (max-width: 992px) {
+    .modal-content-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    .footer-columns-container {
+        grid-template-columns: 1fr 1fr;
+        gap: 2.5rem;
+    }
+}
+
+/* Smartphone Adaptive Execution Micro View Layout Configuration Framework Rules */
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+    
+    .hero-content h1 { font-size: 2.25rem; }
+    
+    /* Responsive Navigation Hamburger System Component Operations Transform Framework Layout */
+    .hamburger { display: flex; }
+    
+    .nav-menu {
+        position: fixed;
+        top: -100%;
+        left: 0;
+        width: 100%;
+        background-color: var(--bg-surface);
+        box-shadow: var(--shadow-md);
+        padding: 2rem;
+        border-bottom: 1px solid var(--border-color);
+        transition: var(--transition-smooth);
+        z-index: 999;
+    }
+    
+    .nav-menu.is-active {
+        top: 60px; /* Offset spacing below header bar horizon */
+    }
+    
+    .nav-links {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+    
+    .hamburger[aria-expanded="true"] .bar:nth-child(1) {
+        transform: translateY(9px) rotate(45deg);
+    }
+    .hamburger[aria-expanded="true"] .bar:nth-child(2) {
+        opacity: 0;
+    }
+    .hamburger[aria-expanded="true"] .bar:nth-child(3) {
+        transform: translateY(-9px) rotate(-45deg);
+    }
+    
+    .main-container { padding: 0 1rem; margin-top: -1.5rem; }
+    .control-panel { padding: 1.25rem; gap: 1rem; }
+    
+    .footer-columns-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+    }
+    
+    .modal-body-scrollable { padding: 1.25rem; }
+}

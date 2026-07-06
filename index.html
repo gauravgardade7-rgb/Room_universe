@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RoomFinder V2 - Modern accommodation and coliving rental dashboard.">
+    <title>RoomFinder V2 | Find Your Perfect Stay</title>
+    <!-- Google Fonts & FontAwesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- App Initial Loading Spinner Screen -->
+    <div id="app-loader" class="app-loader" aria-hidden="true">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Main Dynamic Navigation Header Bar -->
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo" aria-label="RoomFinder Home">
+                <i class="fa-solid fa-house-chimney-window"></i> Room<span>Finder</span>
+            </a>
+            
+            <nav class="nav-menu" id="nav-menu">
+                <ul class="nav-links">
+                    <li><a href="#" class="active">Home</a></li>
+                    <li><a href="#discover">Explore Rooms</a></li>
+                    <li><button id="fav-toggle-btn" class="nav-fav-btn"><i class="fa-solid fa-heart"></i> Saved (<span id="fav-count">0</span>)</button></li>
+                </ul>
+            </nav>
+
+            <div class="nav-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle structural dark mode color scheme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
+                <button class="hamburger" id="hamburger" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nav-menu">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- App Hero Header -->
+    <section class="hero-section">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Find Modern Places to Stay</h1>
+            <p>Discover premium rooms, PGs, and flats tailored specifically to your lifestyle requirements.</p>
+        </div>
+    </section>
+
+    <!-- Main Discovery Control Hub & Filter Dashboard -->
+    <main id="discover" class="main-container">
+        <aside class="control-panel">
+            <div class="search-box-wrapper">
+                <label for="search-input" class="sr-only">Search rooms by title, description or address</label>
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" id="search-input" placeholder="Search by area, title, keywords...">
+            </div>
+
+            <div class="filter-group-grid">
+                <!-- City Filter Selection Dropdown -->
+                <div class="filter-box">
+                    <label for="filter-city"><i class="fa-solid fa-city"></i> City</label>
+                    <select id="filter-city">
+                        <option value="">All Cities</option>
+                    </select>
+                </div>
+
+                <!-- Room Type Filters -->
+                <div class="filter-box">
+                    <label for="filter-type"><i class="fa-solid fa-bed"></i> Room Type</label>
+                    <select id="filter-type">
+                        <option value="">All Types</option>
+                        <option value="Single">Single Room</option>
+                        <option value="Double">Double Sharing</option>
+                        <option value="PG">Paying Guest (PG)</option>
+                        <option value="Flat">Apartment / Flat</option>
+                    </select>
+                </div>
+
+                <!-- Target Demographic Gender Filter Selection Dropdown -->
+                <div class="filter-box">
+                    <label for="filter-gender"><i class="fa-solid fa-user-group"></i> Preferred For</label>
+                    <select id="filter-gender">
+                        <option value="">Anyone</option>
+                        <option value="Boys">Boys</option>
+                        <option value="Girls">Girls</option>
+                        <option value="Family">Family</option>
+                    </select>
+                </div>
+
+                <!-- Maximum Price Boundary Budget Range Filter Slider Component -->
+                <div class="filter-box">
+                    <div class="range-labels">
+                        <label for="filter-price"><i class="fa-solid fa-wallet"></i> Max Budget</label>
+                        <span id="price-val">Max</span>
+                    </div>
+                    <input type="range" id="filter-price" min="0" max="30000" step="500">
+                </div>
+
+                <!-- Advanced Operational Result Set Sorter Select Input -->
+                <div class="filter-box">
+                    <label for="sort-select"><i class="fa-solid fa-arrow-up-down-wide-short"></i> Sort By</label>
+                    <select id="sort-select">
+                        <option value="default">Default Features</option>
+                        <option value="low-high">Price: Low to High</option>
+                        <option value="high-low">Price: High to Low</option>
+                        <option value="newest">Newest Listed</option>
+                    </select>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Dynamic Content Engine Output Area -->
+        <section class="results-wrapper" aria-live="polite">
+            <div id="rooms-grid" class="rooms-grid">
+                <!-- Cards injected programmatically via script.js -->
+            </div>
+
+            <!-- Zero State Search Notification Placeholder Layout -->
+            <div id="no-results" class="no-results-card hidden">
+                <i class="fa-solid fa-house-laptop"></i>
+                <h3>No Matching Rooms Found</h3>
+                <p>We couldn't find anything matching your exact filter setup. Try resetting your pricing or broadening parameters!</p>
+            </div>
+
+            <!-- Dynamic Pagination Execution Call To Action Button -->
+            <div class="pagination-container">
+                <button id="load-more-btn" class="btn btn-primary hidden">Load More Listings</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Micro Interaction Overlay Detail Page View Sheet Modal Layout -->
+    <div id="detail-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-window">
+            <button class="modal-close-btn" id="modal-close" aria-label="Close detail window">&times;</button>
+            
+            <div class="modal-body-scrollable">
+                <!-- Media Slideshow Engine View -->
+                <div class="gallery-engine">
+                    <div class="viewer-main-frame">
+                        <img id="modal-main-img" src="" alt="Primary accommodation view">
+                    </div>
+                    <div id="modal-thumbnails" class="gallery-thumbnails-strip">
+                        <!-- Dynamic interactive inline images -->
+                    </div>
+                </div>
+
+                <!-- Structured Overview Grid Specifications Data Block Layout -->
+                <div class="modal-content-grid">
+                    <div class="primary-details-pane">
+                        <div class="badge-row" id="modal-badges"></div>
+                        <h2 id="modal-title">Property Heading Reference Title</h2>
+                        <p class="modal-price-tag">&#8377;<span id="modal-price">0</span>/month</p>
+                        
+                        <hr class="separator">
+                        
+                        <h3>Description</h3>
+                        <p id="modal-desc" class="text-muted-body">Detailed longform paragraph structure content representation...</p>
+                        
+                        <h3>Amenities Offered</h3>
+                        <ul id="modal-amenities" class="amenities-tags-grid"></ul>
+                        
+                        <h3>Location details</h3>
+                        <p id="modal-address" class="address-text-line"><i class="fa-solid fa-location-dot"></i> Loading location marker string...</p>
+                    </div>
+
+                    <aside class="vendor-engagement-card">
+                        <h3>Host & Contact Information</h3>
+                        <div class="vendor-avatar-row">
+                            <div class="avatar-mock"><i class="fa-solid fa-user-tie"></i></div>
+                            <div>
+                                <h4 id="modal-owner">Owner Name</h4>
+                                <p>Verified Property Host</p>
+                            </div>
+                        </div>
+                        <div class="action-buttons-stack">
+                            <a id="btn-call" href="#" class="btn btn-call"><i class="fa-solid fa-phone"></i> Direct Dial Call</a>
+                            <a id="btn-whatsapp" href="#" target="_blank" class="btn btn-whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp Chat</a>
+                        </div>
+                    </aside>
+                </div>
+
+                <!-- Google Maps Frame Embed Container Compartment Component -->
+                <div class="map-iframe-wrapper">
+                    <h3>Geographic Map Location View</h3>
+                    <iframe id="modal-map" src="" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UI Utility Tools Floating Global Actions Engine Controller Bar Component -->
+    <button id="back-to-top" class="back-to-top-btn" aria-label="Return immediately back to page view roof zenith">
+        <i class="fa-solid fa-arrow-up"></i>
+    </button>
+
+    <!-- Professional Standardized Dynamic Layout Global App Footer Element Module -->
+    <footer class="app-footer">
+        <div class="footer-columns-container">
+            <div class="footer-brand-column">
+                <a href="#" class="footer-logo"><i class="fa-solid fa-house-chimney-window"></i> Room<span>Finder</span></a>
+                <p>Providing seamless, fully responsive structural dashboards to locate premium, secure accommodation platforms for scaling developers and renters worldwide.</p>
+            </div>
+            <div class="footer-links-column">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#">Home View</a></li>
+                    <li><a href="#discover">Room Listings Explorer</a></li>
+                    <li><a href="#">About Enterprise</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-column">
+                <h4>Legal & Policies</h4>
+                <ul>
+                    <li><a href="#">Privacy Agreement Policy</a></li>
+                    <li><a href="#">Terms & Conditions</a></li>
+                    <li><a href="#">API Integration Access</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-column">
+                <h4>Corporate Support</h4>
+                <p><i class="fa-solid fa-envelope"></i> help@roomfinderv2.io</p>
+                <p><i class="fa-solid fa-headset"></i> +91 1800-456-7890</p>
+            </div>
+        </div>
+        <div class="footer-copyright-strip">
+            <p>&copy; 2026 RoomFinder V2 Ecosystem Platform. Built for standard high performance deployments.</p>
+        </div>
+    </footer>
+
+    <!-- Core Web Architecture Logic Engine Script Linkage -->
+    <script src="script.js"></script>
+</body>
+</html>
