@@ -7,9 +7,9 @@
     "gender": "Boys",
     "roomType": "Single",
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/data/room1.jpg",
+      "rooms/data/room2.jpg",
+      "rooms/data/room3.jpg"
     ],
     "description": "A premium, fully furnished single room designed for corporate professionals and students. Located in a peaceful neighborhood with 24/7 security and high-speed Wi-Fi access.",
     "amenities": ["Wi-Fi", "AC", "Power Backup", "Washing Machine", "Housekeeping"],
@@ -28,9 +28,9 @@
     "gender": "Girls",
     "roomType": "PG",
     "images": [
-      "rooms/room2.jpg",
-      "rooms/room1.jpg",
-      "rooms/room3.jpg"
+      "rooms/data/room2.jpg",
+      "rooms/data/room1.jpg",
+      "rooms/data/room3.jpg"
     ],
     "description": "Comfortable and secure double-sharing PG accommodations tailored for girls. Walking distance to the metro station, featuring home-cooked meals and laundry facilities.",
     "amenities": ["Wi-Fi", "Food Included", "CCTV Security", "Water Purifier", "Geyser"],
@@ -49,9 +49,9 @@
     "gender": "Family",
     "roomType": "Flat",
     "images": [
-      "rooms/room3.jpg",
-      "rooms/room1.jpg",
-      "rooms/room2.jpg"
+      "rooms/data/room3.jpg",
+      "rooms/data/room1.jpg",
+      "rooms/data/room2.jpg"
     ],
     "description": "Beautiful, well-ventilated 2BHK flat ideal for small families. Includes dedicated covered car parking, children's play area, and proximity to major supermarkets and international schools.",
     "amenities": ["Lift", "Car Parking", "Balcony", "Gym", "Gas Pipeline"],
