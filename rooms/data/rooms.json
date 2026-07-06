@@ -2,8 +2,8 @@
   {
     "id": "room_001",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2500,
-    "city": "Mumbai",
+    "price": 2200,
+    "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Single",
     "images": [
@@ -23,8 +23,8 @@
   {
     "id": "room_002",
     "title": "Spacious Double Sharing PG for Girls",
-    "price": 3000,
-    "city": "Delhi",
+    "price": 1700,
+    "city": "Ullpe Galli",
     "gender": "Girls",
     "roomType": "PG",
     "images": [
