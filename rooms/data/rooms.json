@@ -9,9 +9,8 @@
     "available": true,
 
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/room1.jpg"
+      
     ],
 
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
@@ -33,7 +32,7 @@
   {
     "id": "room_002",
     "title": "Spacious Double Sharing PG for Girls",
-    "price": 1700,
+    "price": 2100,
     "city": "Ullpe Galli",
     "gender": "Girls",
     "roomType": "PG",
@@ -64,7 +63,7 @@
   {
     "id": "room_003",
     "title": "Premium 2BHK Family Flat",
-    "price": 1900,
+    "price": 2200,
     "city": "Bangalore",
     "gender": "Family",
     "roomType": "Flat",
@@ -72,9 +71,8 @@
     "available": true,
 
     "images": [
-      "rooms/room3.jpg",
-      "rooms/room1.jpg",
-      "rooms/room2.jpg"
+      "rooms/room6.jpg"
+      
     ],
 
     "description": "Beautiful well ventilated 2BHK flat ideal for families Available pay 20 rs to get owner details.",
@@ -95,7 +93,7 @@
   {
     "id": "room_004",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2000,
+    "price": 2300,
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Double",
@@ -103,9 +101,8 @@
     "available": true,
 
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/room12.jpg"
+     
     ],
 
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
@@ -127,7 +124,7 @@
   {
     "id": "room_005",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2000,
+    "price": 2400,
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Double",
@@ -135,9 +132,8 @@
     "available": true,
 
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/room12.jpg"
+      
     ],
 
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
@@ -158,7 +154,7 @@
 {
     "id": "room_006",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2000,
+    "price": 2500,
     "city": "Kolhapur",
     "gender": "Girls",
     "roomType": "Single",
@@ -166,9 +162,8 @@
     "available": true,
 
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/room9.jpg"
+      
     ],
 
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
@@ -190,7 +185,7 @@
   {
     "id": "room_007",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2500,
+    "price": 2600,
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Single",
@@ -198,9 +193,8 @@
     "available": true,
 
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/room10.jpg"
+      
     ],
 
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
@@ -222,7 +216,7 @@
   {
     "id": "room_008",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2800,
+    "price": 2700,
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Single",
@@ -230,9 +224,8 @@
     "available": true,
 
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/room12.jpg"
+     
     ],
 
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
@@ -254,7 +247,7 @@
   {
     "id": "room_009",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2500,
+    "price": 2800,
     "city": "Kolhapur",
     "gender": "Girls",
     "roomType": "Single",
@@ -262,9 +255,8 @@
     "available": true,
 
     "images": [
-      "rooms/room1.jpg",
-      "rooms/room2.jpg",
-      "rooms/room3.jpg"
+      "rooms/room11.jpg"
+      
     ],
 
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
