@@ -277,7 +277,7 @@ button, select, input {
 .hero-section {
     position: relative;
     padding: 6rem 2rem;
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), url('rooms/room1.jpg') center/cover no-repeat;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%), center/cover no-repeat;
     background-blend-mode: overlay;
     color: white;
     text-align: center;
