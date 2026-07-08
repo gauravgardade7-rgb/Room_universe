@@ -2,24 +2,34 @@
   {
     "id": "room_001",
     "title": "Luxury Single Room near Tech Park",
-    "price": 2200,
+    "price": 2000,
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Single",
+    "available": true,
+
     "images": [
       "rooms/room1.jpg",
       "rooms/room2.jpg",
       "rooms/room3.jpg"
     ],
-    "description": "A premium, fully furnished single room designed for corporate professionals and students. Located in a peaceful neighborhood with 24/7 security and high-speed Wi-Fi access.",
-    "amenities": ["Wi-Fi", "AC", "Power Backup", "Washing Machine", "Housekeeping"],
-    "address": "Flat 402, Sunshine Heights, Sakinaka, Mumbai - 400072",
-    "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3770.0058866164227!2d72.88094917597444!3d19.107403450711915!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7c80d00000001%3A0x6be7785a21fa3964!2sSakinaka%20Metro%20Station!5e0!3m2!1sen!2sin!4v1710000000000!5m2!1sen!2sin",
-    "ownerName": "Rajesh Kumar",
-    "phone": "+919876543210",
-    "whatsapp": "919876543210",
+
+    "description": "A premium, fully furnished single room designed for corporate professionals and students.",
+
+    "amenities": [
+      "Wi-Fi",
+      "AC",
+      "Power Backup",
+      "Washing Machine",
+      "Housekeeping"
+    ],
+
+  
+    "whatsapp": "917745036055",
+
     "dateAdded": "2026-07-01"
   },
+
   {
     "id": "room_002",
     "title": "Spacious Double Sharing PG for Girls",
@@ -27,20 +37,30 @@
     "city": "Ullpe Galli",
     "gender": "Girls",
     "roomType": "PG",
+
+    "available": true,
+
     "images": [
-      "rooms/room2.jpg",
-      "rooms/room1.jpg",
-      "rooms/room3.jpg"
+      "rooms/room4.jpg",
+      "rooms/room5.jpg"
     ],
-    "description": "Comfortable and secure double-sharing PG accommodations tailored for girls. Walking distance to the metro station, featuring home-cooked meals and laundry facilities.",
-    "amenities": ["Wi-Fi", "Food Included", "CCTV Security", "Water Purifier", "Geyser"],
-    "address": "H-32, Sector 15, Rohini, Near Metro Pillar 89, Delhi - 110089",
-    "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3499.0763261541315!2d77.12356267629555!3d28.62747168434689!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d0370f807df97%3A0x6a05e26ecb057753!2sRohini%20Sector%2015!5e0!3m2!1sen!2sin!4v1710000000001!5m2!1sen!2sin",
-    "ownerName": "Anita Sharma",
-    "phone": "+919876543211",
-    "whatsapp": "919876543211",
+
+    "description": "Comfortable and secure double-sharing PG accommodations.",
+
+    "amenities": [
+      "Wi-Fi",
+      "Food Included",
+      "CCTV Security",
+      "Water Purifier",
+      "Geyser"
+    ],
+
+    
+    "whatsapp": "917745036055",
+
     "dateAdded": "2026-06-25"
   },
+
   {
     "id": "room_003",
     "title": "Premium 2BHK Family Flat",
@@ -48,18 +68,218 @@
     "city": "Bangalore",
     "gender": "Family",
     "roomType": "Flat",
+
+    "available": true,
+
     "images": [
       "rooms/room3.jpg",
       "rooms/room1.jpg",
       "rooms/room2.jpg"
     ],
-    "description": "Beautiful, well-ventilated 2BHK flat ideal for small families. Includes dedicated covered car parking, children's play area, and proximity to major supermarkets and international schools.",
-    "amenities": ["Lift", "Car Parking", "Balcony", "Gym", "Gas Pipeline"],
-    "address": "B-704, Green Glen Layout, Outer Ring Road, Bangalore - 560103",
-    "mapEmbedUrl": "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3888.6254425880457!2d77.67732297583344!3d12.931751015754897!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae13bcbebcffff%3A0xbc4e578f14b6099b!2sGreen%20Glen%20Layout!5e0!3m2!1sen!2sin!4v1710000000002!5m2!1sen!2sin",
-    "ownerName": "Swati",
-    "phone": "+919579648610",
-    "whatsapp": "919579648610",
+
+    "description": "Beautiful well ventilated 2BHK flat ideal for families Available pay 20 rs to get owner details.",
+
+    "amenities": [
+      "Lift",
+      "Car Parking",
+      "Balcony",
+      "Gym",
+      "Gas Pipeline"
+    ],
+
+    "whatsapp": "917745036055",
+
     "dateAdded": "2026-07-04"
+  },
+
+  {
+    "id": "room_004",
+    "title": "Luxury Single Room near Tech Park",
+    "price": 2000,
+    "city": "Kolhapur",
+    "gender": "Boys",
+    "roomType": "Double",
+
+    "available": true,
+
+    "images": [
+      "rooms/room1.jpg",
+      "rooms/room2.jpg",
+      "rooms/room3.jpg"
+    ],
+
+    "description": "A premium, fully furnished single room designed for corporate professionals and students.",
+
+    "amenities": [
+      "Wi-Fi",
+      "AC",
+      "Power Backup",
+      "Washing Machine",
+      "Housekeeping"
+    ],
+
+  
+    "whatsapp": "917745036055",
+
+    "dateAdded": "2026-07-01"
+  },
+
+  {
+    "id": "room_005",
+    "title": "Luxury Single Room near Tech Park",
+    "price": 2000,
+    "city": "Kolhapur",
+    "gender": "Boys",
+    "roomType": "Double",
+
+    "available": true,
+
+    "images": [
+      "rooms/room1.jpg",
+      "rooms/room2.jpg",
+      "rooms/room3.jpg"
+    ],
+
+    "description": "A premium, fully furnished single room designed for corporate professionals and students.",
+
+    "amenities": [
+      "Wi-Fi",
+      "AC",
+      "Power Backup",
+      "Washing Machine",
+      "Housekeeping"
+    ],
+
+  
+    "whatsapp": "917745036055",
+
+    "dateAdded": "2026-07-01"
+  },
+{
+    "id": "room_006",
+    "title": "Luxury Single Room near Tech Park",
+    "price": 2000,
+    "city": "Kolhapur",
+    "gender": "Girls",
+    "roomType": "Single",
+
+    "available": true,
+
+    "images": [
+      "rooms/room1.jpg",
+      "rooms/room2.jpg",
+      "rooms/room3.jpg"
+    ],
+
+    "description": "A premium, fully furnished single room designed for corporate professionals and students.",
+
+    "amenities": [
+      "Wi-Fi",
+      "AC",
+      "Power Backup",
+      "Washing Machine",
+      "Housekeeping"
+    ],
+
+  
+    "whatsapp": "917745036055",
+
+    "dateAdded": "2026-07-01"
+  },
+
+  {
+    "id": "room_007",
+    "title": "Luxury Single Room near Tech Park",
+    "price": 2500,
+    "city": "Kolhapur",
+    "gender": "Boys",
+    "roomType": "Single",
+
+    "available": true,
+
+    "images": [
+      "rooms/room1.jpg",
+      "rooms/room2.jpg",
+      "rooms/room3.jpg"
+    ],
+
+    "description": "A premium, fully furnished single room designed for corporate professionals and students.",
+
+    "amenities": [
+      "Wi-Fi",
+      "AC",
+      "Power Backup",
+      "Washing Machine",
+      "Housekeeping"
+    ],
+
+  
+    "whatsapp": "917745036055",
+
+    "dateAdded": "2026-07-01"
+  },
+
+  {
+    "id": "room_008",
+    "title": "Luxury Single Room near Tech Park",
+    "price": 2800,
+    "city": "Kolhapur",
+    "gender": "Boys",
+    "roomType": "Single",
+
+    "available": true,
+
+    "images": [
+      "rooms/room1.jpg",
+      "rooms/room2.jpg",
+      "rooms/room3.jpg"
+    ],
+
+    "description": "A premium, fully furnished single room designed for corporate professionals and students.",
+
+    "amenities": [
+      "Wi-Fi",
+      "AC",
+      "Power Backup",
+      "Washing Machine",
+      "Housekeeping"
+    ],
+
+  
+    "whatsapp": "917745036055",
+
+    "dateAdded": "2026-07-01"
+  },
+
+  {
+    "id": "room_009",
+    "title": "Luxury Single Room near Tech Park",
+    "price": 2500,
+    "city": "Kolhapur",
+    "gender": "Girls",
+    "roomType": "Single",
+
+    "available": true,
+
+    "images": [
+      "rooms/room1.jpg",
+      "rooms/room2.jpg",
+      "rooms/room3.jpg"
+    ],
+
+    "description": "A premium, fully furnished single room designed for corporate professionals and students.",
+
+    "amenities": [
+      "Wi-Fi",
+      "AC",
+      "Power Backup",
+      "Washing Machine",
+      "Housekeeping"
+    ],
+
+  
+    "whatsapp": "917745036055",
+
+    "dateAdded": "2026-07-01"
   }
 ]
