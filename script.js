@@ -396,8 +396,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Instantiate operational interactive structural vendor communication links mapping vectors
         dom.btnCall.href = `tel:${foundRoomDataRecord.phone}`;
-        dom.btnWhatsapp.href = `https://wa.me/${foundRoomDataRecord.whatsapp}?text=Hello%20${encodeURIComponent(foundRoomDataRecord.ownerName)},%20I%20am%20interested%20in%20your%20listing:%20${encodeURIComponent(foundRoomDataRecord.title)}.`;
-
+        dom.btnWhatsapp.href = `https://wa.me/${foundRoomDataRecord.whatsapp}?text=Hello%20I%20am%20interested%20I%20want%20owner%20details%20can%20you%20send%20your%20payment%20details`;
+        
         // Inject active location address embedding tracking mapping link parameters frameworks
         dom.modalMap.src = foundRoomDataRecord.mapEmbedUrl;
 
