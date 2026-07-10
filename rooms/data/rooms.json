@@ -1,7 +1,7 @@
 [
   {
     "id": "room_001",
-    "title": "Luxury Single Room near Tech Park",
+    "title": "Kasba Bawada",
     "price": 2000,
     "city": "Kolhapur",
     "gender": "Boys",
@@ -31,7 +31,7 @@
 
   {
     "id": "room_002",
-    "title": "Spacious Double Sharing PG for Girls",
+    "title": "Kasba Bawada",
     "price": 2100,
     "city": "Ullpe Galli",
     "gender": "Girls",
@@ -62,7 +62,7 @@
 
   {
     "id": "room_003",
-    "title": "Premium 2BHK Family Flat",
+    "title": "Kasba Bawada",
     "price": 2200,
     "city": "Bangalore",
     "gender": "Family",
@@ -92,7 +92,7 @@
 
   {
     "id": "room_004",
-    "title": "Luxury Single Room near Tech Park",
+    "title": "Kasba Bawada",
     "price": 2300,
     "city": "Kolhapur",
     "gender": "Boys",
@@ -123,7 +123,7 @@
 
   {
     "id": "room_005",
-    "title": "Luxury Single Room near Tech Park",
+    "title": "Kasba Bawada",
     "price": 2400,
     "city": "Kolhapur",
     "gender": "Boys",
@@ -153,7 +153,7 @@
   },
 {
     "id": "room_006",
-    "title": "Luxury Single Room near Tech Park",
+    "title": "Kasba Bawada",
     "price": 2500,
     "city": "Kolhapur",
     "gender": "Girls",
@@ -184,7 +184,7 @@
 
   {
     "id": "room_007",
-    "title": "Luxury Single Room near Tech Park",
+    "title": "Kasba Bawada",
     "price": 2600,
     "city": "Kolhapur",
     "gender": "Boys",
@@ -215,7 +215,7 @@
 
   {
     "id": "room_008",
-    "title": "Luxury Single Room near Tech Park",
+    "title": "Kasba Bawada",
     "price": 2700,
     "city": "Kolhapur",
     "gender": "Boys",
@@ -246,7 +246,7 @@
 
   {
     "id": "room_009",
-    "title": "Luxury Single Room near Tech Park",
+    "title": "Kasba Bawada",
     "price": 2800,
     "city": "Kolhapur",
     "gender": "Girls",
