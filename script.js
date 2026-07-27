@@ -11,10 +11,14 @@ document.addEventListener('DOMContentLoaded', () => {
         allRooms: [],
         filteredRooms: [],
         favoritesList: JSON.parse(localStorage.getItem('rf_favorites')) || [],
+        unlockedRooms: JSON.parse(localStorage.getItem('rf_unlocked_rooms')) || [], // Tracks unlocked contact details
         onlyShowFavorites: false,
         paginationIndex: 0,
         cardsPerPage: 6
     };
+
+    // 🔑 YOUR RAZORPAY TEST KEY ID GOES HERE:
+    const RAZORPAY_KEY_ID = 'rzp_test_TIMiNpjTj8jv5E'; 
 
     // Global DOM Query Element Grid Context Register
     const dom = {
@@ -25,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
         favToggleBtn: document.getElementById('fav-toggle-btn'),
         favCount: document.getElementById('fav-count'),
         roomsGrid: document.getElementById('rooms-grid'),
+        adContainer: document.getElementById('ad-banner-container'),
         noResults: document.getElementById('no-results'),
         loadMoreBtn: document.getElementById('load-more-btn'),
         backToTop: document.getElementById('back-to-top'),
@@ -59,88 +64,113 @@ document.addEventListener('DOMContentLoaded', () => {
        1. GLOBAL ACCESSIBILITY & STRUCTURAL UTILITY TOOL MECHANICS ENGINE HANDLERS
        ========================================================================== */
 
-    // Initialization App Loading Sequence Fading Out Frame View Execution
     setTimeout(() => {
-        dom.loader.style.opacity = '0';
-        setTimeout(() => {
-            dom.loader.classList.add('hidden');
-        }, 500);
+        if (dom.loader) {
+            dom.loader.style.opacity = '0';
+            setTimeout(() => {
+                dom.loader.classList.add('hidden');
+            }, 500);
+        }
     }, 600);
 
-    // Color Scheme Dark Mode Light Mode Structural State Tracking Persistence Setup
     const initializeColorSchemeSystem = () => {
         const activeThemeSaved = localStorage.getItem('rf_theme') || 'light';
         document.documentElement.setAttribute('data-theme', activeThemeSaved);
         updateThemeToggleButtonUI(activeThemeSaved);
     };
 
-    dom.themeToggle.addEventListener('click', () => {
-        const currentActiveTheme = document.documentElement.getAttribute('data-theme');
-        const targetThemeCalculated = currentActiveTheme === 'dark' ? 'light' : 'dark';
-        
-        document.documentElement.setAttribute('data-theme', targetThemeCalculated);
-        localStorage.setItem('rf_theme', targetThemeCalculated);
-        updateThemeToggleButtonUI(targetThemeCalculated);
-    });
+    if (dom.themeToggle) {
+        dom.themeToggle.addEventListener('click', () => {
+            const currentActiveTheme = document.documentElement.getAttribute('data-theme');
+            const targetThemeCalculated = currentActiveTheme === 'dark' ? 'light' : 'dark';
+            
+            document.documentElement.setAttribute('data-theme', targetThemeCalculated);
+            localStorage.setItem('rf_theme', targetThemeCalculated);
+            updateThemeToggleButtonUI(targetThemeCalculated);
+        });
+    }
 
     function updateThemeToggleButtonUI(theme) {
+        if (!dom.themeToggle) return;
         const iconNode = dom.themeToggle.querySelector('i');
-        if (theme === 'dark') {
-            iconNode.className = 'fa-solid fa-sun';
-        } else {
-            iconNode.className = 'fa-solid fa-moon';
+        if (iconNode) {
+            iconNode.className = theme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
         }
     }
 
-    // Mobile Navigation Drawer Toggle Handler Logic Matrix Controller Map
-    dom.hamburger.addEventListener('click', () => {
-        const isMenuOpened = dom.navMenu.classList.toggle('is-active');
-        dom.hamburger.setAttribute('aria-expanded', isMenuOpened);
-    });
-
-    // Close mobile menu if a navigation point is clicked
-    dom.navMenu.querySelectorAll('a').forEach(link => {
-        link.addEventListener('click', () => {
-            dom.navMenu.classList.remove('is-active');
-            dom.hamburger.setAttribute('aria-expanded', 'false');
+    if (dom.hamburger) {
+        dom.hamburger.addEventListener('click', () => {
+            const isMenuOpened = dom.navMenu.classList.toggle('is-active');
+            dom.hamburger.setAttribute('aria-expanded', isMenuOpened);
         });
-    });
+    }
 
-    // Back-to-Top Navigation Button Behavior Control System Routine
+    if (dom.navMenu) {
+        dom.navMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                dom.navMenu.classList.remove('is-active');
+                if (dom.hamburger) dom.hamburger.setAttribute('aria-expanded', 'false');
+            });
+        });
+    }
+
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 400) {
-            dom.backToTop.classList.add('is-visible');
-        } else {
-            dom.backToTop.classList.remove('is-visible');
+        if (dom.backToTop) {
+            if (window.scrollY > 400) {
+                dom.backToTop.classList.add('is-visible');
+            } else {
+                dom.backToTop.classList.remove('is-visible');
+            }
         }
     });
 
-    dom.backToTop.addEventListener('click', () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    if (dom.backToTop) {
+        dom.backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 
     /* ==========================================================================
        2. ASYNC CORE DATA SOURCE FETCH ENGINE PIPELINE
        ========================================================================== */
     const loadPropertiesDataSource = async () => {
         try {
-            // Localized structured filepath reference relative map array extraction
             const networkResponse = await fetch('rooms/data/rooms.json');
             if (!networkResponse.ok) throw new Error('Data endpoint response failed.');
             
             appState.allRooms = await networkResponse.json();
             
-            // Build and dynamically seed dynamic input filters matching data matrix variables
             populateDynamicCityFilters(appState.allRooms);
             synchronizePricingSliderScaleBounds(appState.allRooms);
             
-            // Execute layout compilation render operations cycle context
             syncFavoritesBadgeCounter();
             applyActiveFiltersEnginePipeline();
             
         } catch (errorLog) {
             console.error('RoomFinder Initialization Error Pipeline Dump:', errorLog);
-            dom.roomsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--accent-danger); font-weight:700;">Error connecting to properties repository database. Please refresh or check infrastructure parameters.</p>`;
+            if (dom.roomsGrid) {
+                dom.roomsGrid.innerHTML = `<p style="grid-column: 1/-1; text-align:center; color:var(--accent-danger); font-weight:700;">Error connecting to properties repository database.</p>`;
+            }
+        }
+    };
+
+    const loadAdData = async () => {
+        try {
+            const response = await fetch('ad.json');
+            if (!response.ok) return;
+            const ad = await response.json();
+            
+            if (dom.adContainer) {
+                dom.adContainer.innerHTML = `
+                    <div class="ad-card" style="margin-bottom: 2rem; padding: 20px; background: var(--card-bg); border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); text-align: center; border: 1px solid var(--border-color);">
+                        <h3 style="margin-bottom: 10px;">${ad.title}</h3>
+                        <p style="margin-bottom: 15px; color: var(--text-muted);">${ad.description}</p>
+                        <a href="${ad.link}" target="_blank" class="btn btn-primary">Check It Out</a>
+                    </div>
+                `;
+            }
+        } catch (err) {
+            console.warn('Ad banner configuration not loaded.');
         }
     };
 
@@ -149,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
        ========================================================================== */
     
     function populateDynamicCityFilters(roomsArray) {
+        if (!dom.filterCity) return;
         const extractedCities = [...new Set(roomsArray.map(room => room.city))].sort();
         extractedCities.forEach(cityName => {
             const dynamicOptionElement = document.createElement('option');
@@ -159,24 +190,23 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function synchronizePricingSliderScaleBounds(roomsArray) {
-        if (roomsArray.length === 0) return;
+        if (roomsArray.length === 0 || !dom.filterPrice) return;
         const pricesCollection = roomsArray.map(r => r.price);
         const topBoundCeilingPrice = Math.max(...pricesCollection);
         
         dom.filterPrice.max = topBoundCeilingPrice;
         dom.filterPrice.value = topBoundCeilingPrice;
-        dom.priceVal.textContent = `₹${topBoundCeilingPrice}`;
+        if (dom.priceVal) dom.priceVal.textContent = `₹${topBoundCeilingPrice}`;
     }
 
     const applyActiveFiltersEnginePipeline = () => {
-        const searchKeywordString = dom.searchInput.value.toLowerCase().trim();
-        const targetedCity = dom.filterCity.value;
-        const targetedType = dom.filterType.value;
-        const targetedGender = dom.filterGender.value;
-        const maximumCostBudget = parseInt(dom.filterPrice.value) || Infinity;
+        const searchKeywordString = dom.searchInput ? dom.searchInput.value.toLowerCase().trim() : '';
+        const targetedCity = dom.filterCity ? dom.filterCity.value : '';
+        const targetedType = dom.filterType ? dom.filterType.value : '';
+        const targetedGender = dom.filterGender ? dom.filterGender.value : '';
+        const maximumCostBudget = dom.filterPrice ? parseInt(dom.filterPrice.value) || Infinity : Infinity;
 
         appState.filteredRooms = appState.allRooms.filter(room => {
-            // Structural evaluations verification logical array filters
             const matchesSearchInput = !searchKeywordString || 
                 room.title.toLowerCase().includes(searchKeywordString) ||
                 room.description.toLowerCase().includes(searchKeywordString) ||
@@ -197,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function executeDataResultSetSorting() {
-        const explicitSortingCriteria = dom.sortSelect.value;
+        const explicitSortingCriteria = dom.sortSelect ? dom.sortSelect.value : '';
         
         if (explicitSortingCriteria === 'low-high') {
             appState.filteredRooms.sort((a, b) => a.price - b.price);
@@ -207,15 +237,16 @@ document.addEventListener('DOMContentLoaded', () => {
             appState.filteredRooms.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
         }
 
-        // Reset pagination viewport windows and dispatch template injection engine
         appState.paginationIndex = 0;
         injectFilteredCardLayoutViews(false);
     }
 
     /* ==========================================================================
-       4. DYNAMIC VIEW COMPONENT RENDERING MATRIX ENGINE WITH IMAGE LAZY-LOADING
+       4. DYNAMIC VIEW COMPONENT RENDERING
        ========================================================================== */
     function injectFilteredCardLayoutViews(appendDataStreamMode = false) {
+        if (!dom.roomsGrid) return;
+
         if (!appendDataStreamMode) {
             dom.roomsGrid.innerHTML = '';
         }
@@ -223,14 +254,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const exactTotalMatches = appState.filteredRooms.length;
         
         if (exactTotalMatches === 0) {
-            dom.noResults.classList.remove('hidden');
-            dom.loadMoreBtn.classList.add('hidden');
+            if (dom.noResults) dom.noResults.classList.remove('hidden');
+            if (dom.loadMoreBtn) dom.loadMoreBtn.classList.add('hidden');
             return;
         } else {
-            dom.noResults.classList.add('hidden');
+            if (dom.noResults) dom.noResults.classList.add('hidden');
         }
 
-        // Slice calculations execution block array data stream bounds mappings
         const startingBoundaryPointer = appState.paginationIndex * appState.cardsPerPage;
         const terminalBoundaryPointer = Math.min(startingBoundaryPointer + appState.cardsPerPage, exactTotalMatches);
         const segmentRenderSet = appState.filteredRooms.slice(startingBoundaryPointer, terminalBoundaryPointer);
@@ -239,15 +269,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const isSavedFavorite = appState.favoritesList.includes(roomItem.id);
             const physicalCardNodeElement = document.createElement('article');
             physicalCardNodeElement.className = 'room-card';
-            // Stagger animation timing for smooth presentation load-in effects
             physicalCardNodeElement.style.animationDelay = `${absoluteIncrementalIndex * 0.05}s`;
             
             physicalCardNodeElement.innerHTML = `
                 <div class="card-media-wrapper">
-                    <button class="fav-trigger-btn ${isSavedFavorite ? 'is-favorite' : ''}" data-id="${roomItem.id}" aria-label="Add listing to custom saved dashboard list">
+                    <button class="fav-trigger-btn ${isSavedFavorite ? 'is-favorite' : ''}" data-id="${roomItem.id}" aria-label="Add to favorites">
                         <i class="${isSavedFavorite ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
                     </button>
-                    <!-- Enhanced Image Performance Lazy Loading Configuration Mode -->
                     <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3C/svg%3E" data-src="${roomItem.images[0]}" alt="${roomItem.title}" class="lazy-load-img">
                     <span class="badge-pill">${roomItem.roomType}</span>
                 </div>
@@ -260,24 +288,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             `;
-
             dom.roomsGrid.appendChild(physicalCardNodeElement);
         });
 
-        // Initialize Native IntersectionObserver Engine for Image Lazy Loading
         initializeLazyLoadingEngine();
 
-        // Evaluate state parameters to hide or display the "Load More" pagination trigger
-        if (terminalBoundaryPointer < exactTotalMatches) {
-            dom.loadMoreBtn.classList.remove('hidden');
-        } else {
-            dom.loadMoreBtn.classList.add('hidden');
+        if (dom.loadMoreBtn) {
+            if (terminalBoundaryPointer < exactTotalMatches) {
+                dom.loadMoreBtn.classList.remove('hidden');
+            } else {
+                dom.loadMoreBtn.classList.add('hidden');
+            }
         }
     }
 
     function initializeLazyLoadingEngine() {
         const imageElementsList = document.querySelectorAll('.lazy-load-img');
-        
         if ('IntersectionObserver' in window) {
             const visualImageObserver = new IntersectionObserver((observedEntries, observerContext) => {
                 observedEntries.forEach(entryNode => {
@@ -288,35 +314,33 @@ document.addEventListener('DOMContentLoaded', () => {
                         observerContext.unobserve(directImageNode);
                     }
                 });
-            }, { rootMargin: '0px 0px 200px 0px' }); // Load ahead for smooth scrolling
-
+            }, { rootMargin: '0px 0px 200px 0px' });
             imageElementsList.forEach(img => visualImageObserver.observe(img));
         } else {
-            // Fallback strategy execution mechanism for legacy ecosystem compatibility maps
-            imageElementsList.forEach(img => {
-                img.src = img.getAttribute('data-src');
-            });
+            imageElementsList.forEach(img => img.src = img.getAttribute('data-src'));
         }
     }
 
     /* ==========================================================================
-       5. PERSISTENT LOCAL STORAGE FAVORITE ARCHITECTURE INFRASTRUCTURE MODULE
+       5. PERSISTENT LOCAL STORAGE FAVORITE ARCHITECTURE
        ========================================================================== */
-    dom.roomsGrid.addEventListener('click', (clickEventContext) => {
-        const contextualFavoriteTargetButton = clickEventContext.target.closest('.fav-trigger-btn');
-        if (contextualFavoriteTargetButton) {
-            clickEventContext.stopPropagation();
-            const targetedPropertyID = contextualFavoriteTargetButton.getAttribute('data-id');
-            toggleFavoriteElementPersistenceState(targetedPropertyID, contextualFavoriteTargetButton);
-            return;
-        }
+    if (dom.roomsGrid) {
+        dom.roomsGrid.addEventListener('click', (clickEventContext) => {
+            const contextualFavoriteTargetButton = clickEventContext.target.closest('.fav-trigger-btn');
+            if (contextualFavoriteTargetButton) {
+                clickEventContext.stopPropagation();
+                const targetedPropertyID = contextualFavoriteTargetButton.getAttribute('data-id');
+                toggleFavoriteElementPersistenceState(targetedPropertyID, contextualFavoriteTargetButton);
+                return;
+            }
 
-        const contextualDetailTargetButton = clickEventContext.target.closest('.open-detail-trigger');
-        if (contextualDetailTargetButton) {
-            const targetedPropertyID = contextualDetailTargetButton.getAttribute('data-id');
-            openDetailModalSheetWindow(targetedPropertyID);
-        }
-    });
+            const contextualDetailTargetButton = clickEventContext.target.closest('.open-detail-trigger');
+            if (contextualDetailTargetButton) {
+                const targetedPropertyID = contextualDetailTargetButton.getAttribute('data-id');
+                openDetailModalSheetWindow(targetedPropertyID);
+            }
+        });
+    }
 
     function toggleFavoriteElementPersistenceState(propertyId, htmlButtonNode) {
         let internalFavoritesTrackArray = [...appState.favoritesList];
@@ -336,45 +360,40 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('rf_favorites', JSON.stringify(internalFavoritesTrackArray));
         syncFavoritesBadgeCounter();
 
-        // Hot refresh dynamic listing view states if viewing favorite dashboard metrics only
         if (appState.onlyShowFavorites) {
             applyActiveFiltersEnginePipeline();
         }
     }
 
     function syncFavoritesBadgeCounter() {
-        dom.favCount.textContent = appState.favoritesList.length;
+        if (dom.favCount) {
+            dom.favCount.textContent = appState.favoritesList.length;
+        }
     }
 
-    dom.favToggleBtn.addEventListener('click', () => {
-        appState.onlyShowFavorites = !appState.onlyShowFavorites;
-        if (appState.onlyShowFavorites) {
-            dom.favToggleBtn.classList.add('active-filter');
-        } else {
-            dom.favToggleBtn.classList.remove('active-filter');
-        }
-        applyActiveFiltersEnginePipeline();
-    });
+    if (dom.favToggleBtn) {
+        dom.favToggleBtn.addEventListener('click', () => {
+            appState.onlyShowFavorites = !appState.onlyShowFavorites;
+            dom.favToggleBtn.classList.toggle('active-filter', appState.onlyShowFavorites);
+            applyActiveFiltersEnginePipeline();
+        });
+    }
 
     /* ==========================================================================
-       6. MODAL OVERLAY DETAIL DISPLAY SHEET CONTROL SYSTEM ENGINE ROUTINES
+       6. MODAL OVERLAY DETAIL DISPLAY SHEET & RAZORPAY INTEGRATION
        ========================================================================== */
     function openDetailModalSheetWindow(propertyId) {
         const foundRoomDataRecord = appState.allRooms.find(r => r.id === propertyId);
         if (!foundRoomDataRecord) return;
 
-        // Reset and inject primary focal display photo asset image
         dom.modalMainImg.src = foundRoomDataRecord.images[0];
         dom.modalMainImg.alt = foundRoomDataRecord.title;
 
-        // Build responsive thumbnail click handlers
         dom.modalThumbnails.innerHTML = '';
         foundRoomDataRecord.images.forEach((imagePathString, dynamicIndexIndex) => {
             const thumbnailImageNode = document.createElement('img');
             thumbnailImageNode.src = imagePathString;
-            thumbnailImageNode.alt = `View thumbnail index mapping ${dynamicIndexIndex}`;
             if (dynamicIndexIndex === 0) thumbnailImageNode.className = 'thumb-active';
-            
             thumbnailImageNode.addEventListener('click', () => {
                 dom.modalMainImg.src = imagePathString;
                 dom.modalThumbnails.querySelectorAll('img').forEach(t => t.classList.remove('thumb-active'));
@@ -383,7 +402,6 @@ document.addEventListener('DOMContentLoaded', () => {
             dom.modalThumbnails.appendChild(thumbnailImageNode);
         });
 
-        // Seed descriptive semantic standard textual information metadata variables blocks
         dom.modalBadges.innerHTML = `
             <span class="badge-gender">${foundRoomDataRecord.gender} Profile</span>
             <span class="badge-type">${foundRoomDataRecord.roomType} Allocation</span>
@@ -394,66 +412,122 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.modalAddress.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${foundRoomDataRecord.address}`;
         dom.modalOwner.textContent = foundRoomDataRecord.ownerName;
 
-        // Instantiate operational interactive structural vendor communication links mapping vectors
-        dom.btnCall.href = `tel:${foundRoomDataRecord.phone}`;
-        dom.btnWhatsapp.href = `https://wa.me/${foundRoomDataRecord.whatsapp}?text=Hello%20I%20am%20interested%20I%20want%20owner%20details%20can%20you%20send%20your%20payment%20details`;
-        
-        // Inject active location address embedding tracking mapping link parameters frameworks
-        dom.modalMap.src = foundRoomDataRecord.mapEmbedUrl;
+        // Manage Payment Unlocking Logic for Owner Contact Information
+        const isUnlocked = appState.unlockedRooms.includes(propertyId);
+        renderContactButtonsState(foundRoomDataRecord, isUnlocked);
 
-        // Open layout configuration matrix parameters update views changes targets
+        if (dom.modalMap) dom.modalMap.src = foundRoomDataRecord.mapEmbedUrl || '';
+
         dom.modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden'; // Lock scrolling behind modal window viewport boundaries
-        dom.modalClose.focus();
+        document.body.style.overflow = 'hidden';
+    }
+
+    function renderContactButtonsState(roomData, isUnlocked) {
+        if (isUnlocked) {
+            // Unlocked State: Provide Direct Contact Links
+            dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${roomData.phone}`;
+            dom.btnCall.onclick = () => window.location.href = `tel:${roomData.phone}`;
+            
+            dom.btnWhatsapp.innerHTML = `<i class="fa-brands fa-whatsapp"></i> WhatsApp`;
+            dom.btnWhatsapp.onclick = () => window.open(`https://wa.me/${roomData.whatsapp}?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(roomData.title)}`, '_blank');
+        } else {
+            // Locked State: Require Razorpay Payment
+            dom.btnCall.innerHTML = `<i class="fa-solid fa-lock"></i> Unlock Call Info (₹10)`;
+            dom.btnCall.onclick = (e) => {
+                e.preventDefault();
+                initiateRazorpayPayment(roomData);
+            };
+
+            dom.btnWhatsapp.innerHTML = `<i class="fa-solid fa-lock"></i> Unlock WhatsApp (₹10)`;
+            dom.btnWhatsapp.onclick = (e) => {
+                e.preventDefault();
+                initiateRazorpayPayment(roomData);
+            };
+        }
+    }
+
+    function initiateRazorpayPayment(roomData) {
+        if (typeof Razorpay === 'undefined') {
+            alert('Razorpay SDK failed to load. Check your internet connection or script tag in index.html.');
+            return;
+        }
+
+        const options = {
+            "key": RAZORPAY_KEY_ID,
+            "amount": "1000", // ₹10 in paise
+            "currency": "INR",
+            "name": "RoomFinder",
+            "description": `Unlock owner contact details for ${roomData.title}`,
+            "handler": function (response) {
+                alert(`Payment Successful! Payment ID: ${response.razorpay_payment_id}`);
+                
+                // Add room to local storage unlocked array
+                if (!appState.unlockedRooms.includes(roomData.id)) {
+                    appState.unlockedRooms.push(roomData.id);
+                    localStorage.setItem('rf_unlocked_rooms', JSON.stringify(appState.unlockedRooms));
+                }
+
+                // Immediately update buttons in modal view
+                renderContactButtonsState(roomData, true);
+            },
+            "prefill": {
+                "name": "Test User",
+                "email": "test.user@example.com",
+                "contact": "9999999999"
+            },
+            "theme": {
+                "color": "#2563eb"
+            }
+        };
+
+        const rzp = new Razorpay(options);
+        rzp.open();
     }
 
     const closeDetailModalWindowSheet = () => {
-        dom.modal.classList.add('hidden');
-        document.body.style.overflow = ''; // Unblock background main frame page scroll vectors
-        dom.modalMap.src = ''; // Flush running embedded frames maps vectors out immediately to save memory channels
+        if (dom.modal) dom.modal.classList.add('hidden');
+        document.body.style.overflow = '';
+        if (dom.modalMap) dom.modalMap.src = '';
     };
 
-    dom.modalClose.addEventListener('click', closeDetailModalWindowSheet);
-    dom.modal.addEventListener('click', (eventInstanceContext) => {
-        if (eventInstanceContext.target === dom.modal) {
-            closeDetailModalWindowSheet();
-        }
-    });
-
-    // Capture system hardware keyboard escape events to close active screen layouts
-    document.addEventListener('keydown', (keyboardEvent) => {
-        if (keyboardEvent.key === 'Escape' && !dom.modal.classList.contains('hidden')) {
-            closeDetailModalWindowSheet();
+    if (dom.modalClose) dom.modalClose.addEventListener('click', closeDetailModalWindowSheet);
+    if (dom.modal) {
+        dom.modal.addEventListener('click', (e) => { 
+            if (e.target === dom.modal) closeDetailModalWindowSheet(); 
+        });
+    }
+    
+    document.addEventListener('keydown', (e) => { 
+        if (e.key === 'Escape' && dom.modal && !dom.modal.classList.contains('hidden')) {
+            closeDetailModalWindowSheet(); 
         }
     });
 
     /* ==========================================================================
-       7. ACTIVE DISPATCH REALTIME EVENT LISTENERS ATTACHMENTS PIPELINES MAPS
+       7. INITIALIZATION PIPELINES
        ========================================================================== */
+    if (dom.searchInput) dom.searchInput.addEventListener('input', applyActiveFiltersEnginePipeline);
+    if (dom.filterCity) dom.filterCity.addEventListener('change', applyActiveFiltersEnginePipeline);
+    if (dom.filterType) dom.filterType.addEventListener('change', applyActiveFiltersEnginePipeline);
+    if (dom.filterGender) dom.filterGender.addEventListener('change', applyActiveFiltersEnginePipeline);
     
-    // Instant Live Capture Filtering Input Sequence Trigger Handler Engine Hook
-    dom.searchInput.addEventListener('input', applyActiveFiltersEnginePipeline);
-    
-    // Regular Dashboard Dropdown Dynamic Select Filter Input Interactivity Listeners Hooks
-    dom.filterCity.addEventListener('change', applyActiveFiltersEnginePipeline);
-    dom.filterType.addEventListener('change', applyActiveFiltersEnginePipeline);
-    dom.filterGender.addEventListener('change', applyActiveFiltersEnginePipeline);
-    
-    // Pricing slider range monitoring updates logic loops
-    dom.filterPrice.addEventListener('input', (eventObj) => {
-        dom.priceVal.textContent = `₹${eventObj.target.value}`;
-        applyActiveFiltersEnginePipeline();
-    });
+    if (dom.filterPrice) {
+        dom.filterPrice.addEventListener('input', (e) => {
+            if (dom.priceVal) dom.priceVal.textContent = `₹${e.target.value}`;
+            applyActiveFiltersEnginePipeline();
+        });
+    }
 
-    dom.sortSelect.addEventListener('change', executeDataResultSetSorting);
+    if (dom.sortSelect) dom.sortSelect.addEventListener('change', executeDataResultSetSorting);
+    if (dom.loadMoreBtn) {
+        dom.loadMoreBtn.addEventListener('click', () => {
+            appState.paginationIndex++;
+            injectFilteredCardLayoutViews(true);
+        });
+    }
 
-    // Pagination dynamic layout appending action handlers linkage wire-up setup
-    dom.loadMoreBtn.addEventListener('click', () => {
-        appState.paginationIndex++;
-        injectFilteredCardLayoutViews(true);
-    });
-
-    // Launch structural system execution sequence processes profiles
+    // Execute Launch Sequences
     initializeColorSchemeSystem();
     loadPropertiesDataSource();
+    loadAdData();
 });
