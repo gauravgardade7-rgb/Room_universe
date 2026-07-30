@@ -400,27 +400,36 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function openDetailModalSheetWindow(propertyId) {
-        const foundRoomDataRecord = appState.allRooms.find(r => r.id === propertyId);
-        if (!foundRoomDataRecord) return;
+    const foundRoomDataRecord = appState.allRooms.find(r => r.id === propertyId);
+    if (!foundRoomDataRecord) return;
 
-        dom.modalMainImg.src = foundRoomDataRecord.images[0];
-        dom.modalMainImg.alt = foundRoomDataRecord.title;
+    dom.modalMainImg.src = foundRoomDataRecord.images[0];
+    dom.modalMainImg.alt = foundRoomDataRecord.title;
 
-        dom.modalThumbnails.innerHTML = '';
-        foundRoomDataRecord.images.forEach((imagePathString, dynamicIndexIndex) => {
-            const thumbnailImageNode = document.createElement('img');
-            thumbnailImageNode.src = imagePathString;
-            if (dynamicIndexIndex === 0) thumbnailImageNode.className = 'thumb-active';
-            thumbnailImageNode.addEventListener('click', () => {
-                dom.modalMainImg.src = imagePathString;
-                dom.modalThumbnails.querySelectorAll('img').forEach(t => t.classList.remove('thumb-active'));
-                thumbnailImageNode.classList.add('thumb-active');
-            });
-            dom.modalThumbnails.appendChild(thumbnailImageNode);
+    dom.modalThumbnails.innerHTML = '';
+    foundRoomDataRecord.images.forEach((imagePathString, dynamicIndexIndex) => {
+        const thumbnailImageNode = document.createElement('img');
+        thumbnailImageNode.src = imagePathString;
+        if (dynamicIndexIndex === 0) thumbnailImageNode.className = 'thumb-active';
+        thumbnailImageNode.addEventListener('click', () => {
+            dom.modalMainImg.src = imagePathString;
+            dom.modalThumbnails.querySelectorAll('img').forEach(t => t.classList.remove('thumb-active'));
+            thumbnailImageNode.classList.add('thumb-active');
         });
+        dom.modalThumbnails.appendChild(thumbnailImageNode);
+    });
 
-        dom.modalBadges.innerHTML = `
-            <span class="badge-gender">${foundRoomDataRecord.gender} Profile</span>
-            <span class="badge-type">${foundRoomDataRecord.roomType} Allocation</span>
-        `;
-        dom.modalTitle
+    dom.modalBadges.innerHTML = `
+        <span class="badge-gender">${foundRoomDataRecord.gender} Profile</span>
+        <span class="badge-type">${foundRoomDataRecord.roomType} Allocation</span>
+    `;
+
+    dom.modalTitle.innerText = foundRoomDataRecord.title;
+    
+    // Display Modal
+    if (dom.detailModal) {
+        dom.detailModal.style.display = 'block';
+    }
+} // <--- Closes openDetailModalSheetWindow
+
+}); // <--- CRITICAL: Closes document.addEventListener('DOMContentLoaded', () => {
