@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sortSelect: document.getElementById('sort-select'),
         
         // Modal System Nodes
-        modal: document.getElementById('detail-modal'),
+        detailModal: document.getElementById('detail-modal'),
         modalClose: document.getElementById('modal-close'),
         modalMainImg: document.getElementById('modal-main-img'),
         modalThumbnails: document.getElementById('modal-thumbnails'),
@@ -242,6 +242,27 @@ document.addEventListener('DOMContentLoaded', () => {
         injectFilteredCardLayoutViews(false);
     }
 
+    // Attach Event Listeners to Search and Filters
+    if (dom.searchInput) dom.searchInput.addEventListener('input', applyActiveFiltersEnginePipeline);
+    if (dom.filterCity) dom.filterCity.addEventListener('change', applyActiveFiltersEnginePipeline);
+    if (dom.filterType) dom.filterType.addEventListener('change', applyActiveFiltersEnginePipeline);
+    if (dom.filterGender) dom.filterGender.addEventListener('change', applyActiveFiltersEnginePipeline);
+    if (dom.sortSelect) dom.sortSelect.addEventListener('change', executeDataResultSetSorting);
+    
+    if (dom.filterPrice) {
+        dom.filterPrice.addEventListener('input', () => {
+            if (dom.priceVal) dom.priceVal.textContent = `₹${dom.filterPrice.value}`;
+            applyActiveFiltersEnginePipeline();
+        });
+    }
+
+    if (dom.loadMoreBtn) {
+        dom.loadMoreBtn.addEventListener('click', () => {
+            appState.paginationIndex++;
+            injectFilteredCardLayoutViews(true);
+        });
+    }
+
     /* ==========================================================================
        4. DYNAMIC VIEW COMPONENT RENDERING
        ========================================================================== */
@@ -399,37 +420,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
-    function openDetailModalSheetWindow(propertyId) {
-    const foundRoomDataRecord = appState.allRooms.find(r => r.id === propertyId);
-    if (!foundRoomDataRecord) return;
+    const initiateRazorpayPayment = async (roomData) => {
+        const isSDKLoaded = await loadRazorpaySDK();
+        if (!isSDKLoaded) {
+            alert('Razorpay Gateway SDK failed to load. Please check your network connection.');
+            return;
+        }
 
-    dom.modalMainImg.src = foundRoomDataRecord.images[0];
-    dom.modalMainImg.alt = foundRoomDataRecord.title;
-
-    dom.modalThumbnails.innerHTML = '';
-    foundRoomDataRecord.images.forEach((imagePathString, dynamicIndexIndex) => {
-        const thumbnailImageNode = document.createElement('img');
-        thumbnailImageNode.src = imagePathString;
-        if (dynamicIndexIndex === 0) thumbnailImageNode.className = 'thumb-active';
-        thumbnailImageNode.addEventListener('click', () => {
-            dom.modalMainImg.src = imagePathString;
-            dom.modalThumbnails.querySelectorAll('img').forEach(t => t.classList.remove('thumb-active'));
-            thumbnailImageNode.classList.add('thumb-active');
-        });
-        dom.modalThumbnails.appendChild(thumbnailImageNode);
-    });
-
-    dom.modalBadges.innerHTML = `
-        <span class="badge-gender">${foundRoomDataRecord.gender} Profile</span>
-        <span class="badge-type">${foundRoomDataRecord.roomType} Allocation</span>
-    `;
-
-    dom.modalTitle.innerText = foundRoomDataRecord.title;
-    
-    // Display Modal
-    if (dom.detailModal) {
-        dom.detailModal.style.display = 'block';
-    }
-} // <--- Closes openDetailModalSheetWindow
-
-}); // <--- CRITICAL: Closes document.addEventListener('DOMContentLoaded', () => {
+        try {
