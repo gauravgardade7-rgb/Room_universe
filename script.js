@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // 🔑 YOUR RAZORPAY TEST KEY ID GOES HERE:
-    const RAZORPAY_KEY_ID = 'rzp_test_TIMiNpjTj8jv5E'; 
+     const RAZORPAY_KEY_ID = 'rzp_live_TJnZ1Lam93LZLX';
 
     // Global DOM Query Element Grid Context Register
     const dom = {
