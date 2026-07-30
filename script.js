@@ -511,7 +511,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: 1000, // ₹10 in paise
+                    amount: 10, // ₹10 in paise
                     currency: 'INR',
                     receipt: `receipt_unlock_${roomData.id}`
                 })
