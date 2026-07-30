@@ -30,10 +30,10 @@ app.get('/', (req, res) => {
 // Endpoint 1: Create Razorpay Order
 app.post('/api/create-order', async (req, res) => {
   try {
+    // Default amount set to 10 Rupees
     const { amount = 10, currency = 'INR', receipt } = req.body; 
 
-    // Convert Rupees to Paise (Razorpay expects amount in lowest currency unit)
-    // If frontend sends 10 (rupees), multiply by 100 to get 1000 paise
+    // Convert Rupees to Paise (₹10 * 100 = 1000 paise)
     const amountInPaise = Math.round(Number(amount) * 100);
 
     if (isNaN(amountInPaise) || amountInPaise < 100) {
@@ -41,7 +41,7 @@ app.post('/api/create-order', async (req, res) => {
     }
 
     const options = {
-      amount: amountInPaise,
+      amount: amountInPaise, // 1000 paise = ₹10
       currency,
       receipt: receipt || `receipt_${Date.now()}`,
     };
@@ -49,7 +49,7 @@ app.post('/api/create-order', async (req, res) => {
     const order = await razorpay.orders.create(options);
 
     return res.status(200).json({
-      id: order.id,            // Matches frontend expecting `orderData.id`
+      id: order.id,
       order_id: order.id,
       amount: order.amount,
       currency: order.currency,
