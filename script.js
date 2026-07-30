@@ -17,9 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cardsPerPage: 6
     };
 
-    // 🔑 YOUR RAZORPAY TEST KEY ID (Fixed extra space):
+    // 🔑 RAZORPAY PRODUCTION KEYS & SERVER CONFIGURATION
     const RAZORPAY_KEY_ID = 'rzp_live_TJnZ1Lam93LZLX';
-    const BACKEND_URL = 'https://your-deployed-backend-url.onrender.com'; // Express Server Endpoint
+    const BACKEND_URL = 'https://room-universe-backend.onrender.com'; // Express Server Endpoint on Render
 
     // Global DOM Query Element Grid Context Register
     const dom = {
@@ -383,6 +383,22 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ==========================================================================
        6. MODAL OVERLAY DETAIL DISPLAY SHEET & RAZORPAY INTEGRATION
        ========================================================================== */
+    
+    // Inject Razorpay script if not already present
+    const loadRazorpaySDK = () => {
+        return new Promise((resolve) => {
+            if (window.Razorpay) {
+                resolve(true);
+                return;
+            }
+            const scriptNode = document.createElement('script');
+            scriptNode.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            scriptNode.onload = () => resolve(true);
+            scriptNode.onerror = () => resolve(false);
+            document.body.appendChild(scriptNode);
+        });
+    };
+
     function openDetailModalSheetWindow(propertyId) {
         const foundRoomDataRecord = appState.allRooms.find(r => r.id === propertyId);
         if (!foundRoomDataRecord) return;
@@ -407,181 +423,4 @@ document.addEventListener('DOMContentLoaded', () => {
             <span class="badge-gender">${foundRoomDataRecord.gender} Profile</span>
             <span class="badge-type">${foundRoomDataRecord.roomType} Allocation</span>
         `;
-        dom.modalTitle.textContent = foundRoomDataRecord.title;
-        dom.modalPrice.textContent = foundRoomDataRecord.price;
-        dom.modalDesc.textContent = foundRoomDataRecord.description;
-        
-        // Location address fallback handling
-        const addressText = foundRoomDataRecord.address || foundRoomDataRecord.location || `${foundRoomDataRecord.city || 'Kasba Bawda'}, Kolhapur`;
-        dom.modalAddress.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${addressText}`;
-        dom.modalOwner.textContent = foundRoomDataRecord.ownerName || 'Verified Host';
-
-        // Manage Payment Unlocking Logic for Owner Contact Information
-        const isUnlocked = appState.unlockedRooms.includes(propertyId);
-        renderContactButtonsState(foundRoomDataRecord, isUnlocked);
-
-        if (dom.modalMap) dom.modalMap.src = foundRoomDataRecord.mapEmbedUrl || '';
-
-        dom.modal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function renderContactButtonsState(roomData, isUnlocked) {
-        if (isUnlocked) {
-            // Unlocked State: Provide Direct Contact Links with safe fallback
-            const phoneNum = roomData.phone || roomData.contact || "9876543210";
-            const whatsappNum = roomData.whatsapp || roomData.phone || "919876543210";
-
-            dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${phoneNum}`;
-            dom.btnCall.onclick = () => window.location.href = `tel:${phoneNum}`;
-            
-            dom.btnWhatsapp.innerHTML = `<i class="fa-brands fa-whatsapp"></i> WhatsApp`;
-            dom.btnWhatsapp.onclick = () => window.open(`https://wa.me/${whatsappNum}?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(roomData.title)}`, '_blank');
-        } else {
-            // Locked State: Require Razorpay Payment
-            dom.btnCall.innerHTML = `<i class="fa-solid fa-lock"></i> Unlock Call Info (₹10)`;
-            dom.btnCall.onclick = (e) => {
-                e.preventDefault();
-                initiateRazorpayPayment(roomData);
-            };
-
-            dom.btnWhatsapp.innerHTML = `<i class="fa-solid fa-lock"></i> Unlock WhatsApp (₹10)`;
-            dom.btnWhatsapp.onclick = (e) => {
-                e.preventDefault();
-                initiateRazorpayPayment(roomData);
-            };
-        }
-    }
-
-    async function initiateRazorpayPayment(roomData) {
-        if (typeof Razorpay === 'undefined') {
-            alert('Razorpay SDK failed to load. Check your internet connection or script tag in index.html.');
-            return;
-        }
-
-        try {
-            // 1. Create Order via Express Backend
-            const response = await fetch(`${BACKEND_URL}/api/create-order`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: 1000, // ₹10 in paise
-                    currency: 'INR',
-                    receipt: `receipt_unlock_${roomData.id}`
-                })
-            });
-
-            const orderData = await response.json();
-            if (!response.ok) throw new Error(orderData.error || 'Failed to create Razorpay order on server.');
-
-            // 2. Setup Razorpay Checkout Options
-            const options = {
-                "key": RAZORPAY_KEY_ID,
-                "amount": orderData.amount,
-                "currency": orderData.currency,
-                "name": "RoomFinder V2",
-                "description": `Unlock owner contact details for ${roomData.title}`,
-                "order_id": orderData.order_id,
-                "handler": async function (paymentResponse) {
-                    // 3. Verify Payment Signature via Express Backend
-                    const verifyRes = await fetch(`${BACKEND_URL}/api/verify-payment`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            razorpay_order_id: paymentResponse.razorpay_order_id,
-                            razorpay_payment_id: paymentResponse.razorpay_payment_id,
-                            razorpay_signature: paymentResponse.razorpay_signature
-                        })
-                    });
-
-                    const verifyData = await verifyRes.json();
-
-                    if (verifyRes.ok) {
-                        alert(`Payment Verified Successfully! Payment ID: ${paymentResponse.razorpay_payment_id}`);
-
-                        if (!appState.unlockedRooms.includes(roomData.id)) {
-                            appState.unlockedRooms.push(roomData.id);
-                            localStorage.setItem('rf_unlocked_rooms', JSON.stringify(appState.unlockedRooms));
-                        }
-
-                        renderContactButtonsState(roomData, true);
-                    } else {
-                        alert(`Payment Verification Failed: ${verifyData.message}`);
-                    }
-                },
-                "modal": {
-                    "ondismiss": function () {
-                        console.log('Payment modal dismissed by user.');
-                    }
-                },
-                "prefill": {
-                    "name": "Test User",
-                    "email": "test.user@example.com",
-                    "contact": "9999999999"
-                },
-                "theme": {
-                    "color": "#2563eb"
-                }
-            };
-
-            const rzp = new Razorpay(options);
-            
-            rzp.on('payment.failed', function (failureResponse) {
-                alert(`Payment Failed: ${failureResponse.error.description}`);
-            });
-
-            rzp.open();
-
-        } catch (err) {
-            console.error('Payment Error:', err);
-            alert(err.message || 'Payment initiation failed.');
-        }
-    }
-
-    const closeDetailModalWindowSheet = () => {
-        if (dom.modal) dom.modal.classList.add('hidden');
-        document.body.style.overflow = '';
-        if (dom.modalMap) dom.modalMap.src = '';
-    };
-
-    if (dom.modalClose) dom.modalClose.addEventListener('click', closeDetailModalWindowSheet);
-    if (dom.modal) {
-        dom.modal.addEventListener('click', (e) => { 
-            if (e.target === dom.modal) closeDetailModalWindowSheet(); 
-        });
-    }
-    
-    document.addEventListener('keydown', (e) => { 
-        if (e.key === 'Escape' && dom.modal && !dom.modal.classList.contains('hidden')) {
-            closeDetailModalWindowSheet(); 
-        }
-    });
-
-    /* ==========================================================================
-       7. INITIALIZATION PIPELINES
-       ========================================================================== */
-    if (dom.searchInput) dom.searchInput.addEventListener('input', applyActiveFiltersEnginePipeline);
-    if (dom.filterCity) dom.filterCity.addEventListener('change', applyActiveFiltersEnginePipeline);
-    if (dom.filterType) dom.filterType.addEventListener('change', applyActiveFiltersEnginePipeline);
-    if (dom.filterGender) dom.filterGender.addEventListener('change', applyActiveFiltersEnginePipeline);
-    
-    if (dom.filterPrice) {
-        dom.filterPrice.addEventListener('input', (e) => {
-            if (dom.priceVal) dom.priceVal.textContent = `₹${e.target.value}`;
-            applyActiveFiltersEnginePipeline();
-        });
-    }
-
-    if (dom.sortSelect) dom.sortSelect.addEventListener('change', executeDataResultSetSorting);
-    if (dom.loadMoreBtn) {
-        dom.loadMoreBtn.addEventListener('click', () => {
-            appState.paginationIndex++;
-            injectFilteredCardLayoutViews(true);
-        });
-    }
-
-    // Execute Launch Sequences
-    initializeColorSchemeSystem();
-    loadPropertiesDataSource();
-    loadAdData();
-});
+        dom.modalTitle
