@@ -293,12 +293,14 @@ document.addEventListener('DOMContentLoaded', () => {
             physicalCardNodeElement.className = 'room-card';
             physicalCardNodeElement.style.animationDelay = `${absoluteIncrementalIndex * 0.05}s`;
             
+            const coverImage = (roomItem.images && roomItem.images.length > 0) ? roomItem.images[0] : 'https://via.placeholder.com/400x300?text=No+Image';
+
             physicalCardNodeElement.innerHTML = `
                 <div class="card-media-wrapper">
                     <button class="fav-trigger-btn ${isSavedFavorite ? 'is-favorite' : ''}" data-id="${roomItem.id}" aria-label="Add to favorites">
                         <i class="${isSavedFavorite ? 'fa-solid' : 'fa-regular'} fa-heart"></i>
                     </button>
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3C/svg%3E" data-src="${roomItem.images[0]}" alt="${roomItem.title}" class="lazy-load-img">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 4 3'%3E%3C/svg%3E" data-src="${coverImage}" alt="${roomItem.title}" class="lazy-load-img">
                     <span class="badge-pill">${roomItem.roomType}</span>
                 </div>
                 <div class="card-body-content">
@@ -409,23 +411,25 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!foundRoomDataRecord) return;
 
         if (dom.modalMainImg) {
-            dom.modalMainImg.src = foundRoomDataRecord.images[0];
+            dom.modalMainImg.src = (foundRoomDataRecord.images && foundRoomDataRecord.images.length > 0) ? foundRoomDataRecord.images[0] : 'https://via.placeholder.com/600x400?text=No+Image';
             dom.modalMainImg.alt = foundRoomDataRecord.title;
         }
 
         if (dom.modalThumbnails) {
             dom.modalThumbnails.innerHTML = '';
-            foundRoomDataRecord.images.forEach((imagePathString, dynamicIndexIndex) => {
-                const thumbnailImageNode = document.createElement('img');
-                thumbnailImageNode.src = imagePathString;
-                if (dynamicIndexIndex === 0) thumbnailImageNode.className = 'thumb-active';
-                thumbnailImageNode.addEventListener('click', () => {
-                    dom.modalMainImg.src = imagePathString;
-                    dom.modalThumbnails.querySelectorAll('img').forEach(t => t.classList.remove('thumb-active'));
-                    thumbnailImageNode.classList.add('thumb-active');
+            if (foundRoomDataRecord.images && foundRoomDataRecord.images.length > 0) {
+                foundRoomDataRecord.images.forEach((imagePathString, dynamicIndexIndex) => {
+                    const thumbnailImageNode = document.createElement('img');
+                    thumbnailImageNode.src = imagePathString;
+                    if (dynamicIndexIndex === 0) thumbnailImageNode.className = 'thumb-active';
+                    thumbnailImageNode.addEventListener('click', () => {
+                        dom.modalMainImg.src = imagePathString;
+                        dom.modalThumbnails.querySelectorAll('img').forEach(t => t.classList.remove('thumb-active'));
+                        thumbnailImageNode.classList.add('thumb-active');
+                    });
+                    dom.modalThumbnails.appendChild(thumbnailImageNode);
                 });
-                dom.modalThumbnails.appendChild(thumbnailImageNode);
-            });
+            }
         }
 
         if (dom.modalBadges) {
@@ -506,12 +510,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            // 1. Request server to create Razorpay Order
+            // 1. Request server to create Razorpay Order (Sends 10 Rupees)
             const response = await fetch(`${BACKEND_URL}/api/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    amount: 10, // ₹10 in paise
+                    amount: 10, // ₹10 INR
                     currency: 'INR',
                     receipt: `receipt_unlock_${roomData.id}`
                 })
@@ -523,7 +527,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // 2. Open Razorpay Checkout modal
             const options = {
                 "key": RAZORPAY_KEY_ID,
-                "amount": orderData.amount,
+                "amount": orderData.amount, // Receives 1000 paise (₹10) from backend
                 "currency": orderData.currency,
                 "name": "RoomFinder V2",
                 "description": `Unlock owner contact details for ${roomData.title}`,
