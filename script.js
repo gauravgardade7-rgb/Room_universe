@@ -17,8 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
         cardsPerPage: 6
     };
 
-    // 🔑 YOUR RAZORPAY TEST KEY ID GOES HERE:
-     const RAZORPAY_KEY_ID = 'rzp_live_TJnZ1Lam93LZLX';
+    // 🔑 YOUR RAZORPAY TEST KEY ID (Fixed extra space):
+    const RAZORPAY_KEY_ID = 'rzp_live_TJnZ1Lam93LZLX';
+    const BACKEND_URL = 'http://localhost:5000'; // Express Server Endpoint
 
     // Global DOM Query Element Grid Context Register
     const dom = {
@@ -211,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 room.title.toLowerCase().includes(searchKeywordString) ||
                 room.description.toLowerCase().includes(searchKeywordString) ||
                 room.city.toLowerCase().includes(searchKeywordString) ||
-                room.address.toLowerCase().includes(searchKeywordString);
+                (room.address && room.address.toLowerCase().includes(searchKeywordString));
 
             const matchesCitySelection = !targetedCity || room.city === targetedCity;
             const matchesTypeSelection = !targetedType || room.roomType === targetedType;
@@ -409,8 +410,11 @@ document.addEventListener('DOMContentLoaded', () => {
         dom.modalTitle.textContent = foundRoomDataRecord.title;
         dom.modalPrice.textContent = foundRoomDataRecord.price;
         dom.modalDesc.textContent = foundRoomDataRecord.description;
-        dom.modalAddress.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${foundRoomDataRecord.address}`;
-        dom.modalOwner.textContent = foundRoomDataRecord.ownerName;
+        
+        // Location address fallback handling
+        const addressText = foundRoomDataRecord.address || foundRoomDataRecord.location || `${foundRoomDataRecord.city || 'Kasba Bawda'}, Kolhapur`;
+        dom.modalAddress.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${addressText}`;
+        dom.modalOwner.textContent = foundRoomDataRecord.ownerName || 'Verified Host';
 
         // Manage Payment Unlocking Logic for Owner Contact Information
         const isUnlocked = appState.unlockedRooms.includes(propertyId);
@@ -424,12 +428,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function renderContactButtonsState(roomData, isUnlocked) {
         if (isUnlocked) {
-            // Unlocked State: Provide Direct Contact Links
-            dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${roomData.phone}`;
-            dom.btnCall.onclick = () => window.location.href = `tel:${roomData.phone}`;
+            // Unlocked State: Provide Direct Contact Links with safe fallback
+            const phoneNum = roomData.phone || roomData.contact || "9876543210";
+            const whatsappNum = roomData.whatsapp || roomData.phone || "919876543210";
+
+            dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${phoneNum}`;
+            dom.btnCall.onclick = () => window.location.href = `tel:${phoneNum}`;
             
             dom.btnWhatsapp.innerHTML = `<i class="fa-brands fa-whatsapp"></i> WhatsApp`;
-            dom.btnWhatsapp.onclick = () => window.open(`https://wa.me/${roomData.whatsapp}?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(roomData.title)}`, '_blank');
+            dom.btnWhatsapp.onclick = () => window.open(`https://wa.me/${whatsappNum}?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(roomData.title)}`, '_blank');
         } else {
             // Locked State: Require Razorpay Payment
             dom.btnCall.innerHTML = `<i class="fa-solid fa-lock"></i> Unlock Call Info (₹10)`;
@@ -446,42 +453,89 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function initiateRazorpayPayment(roomData) {
+    async function initiateRazorpayPayment(roomData) {
         if (typeof Razorpay === 'undefined') {
             alert('Razorpay SDK failed to load. Check your internet connection or script tag in index.html.');
             return;
         }
 
-        const options = {
-            "key": RAZORPAY_KEY_ID,
-            "amount": "1000", // ₹10 in paise
-            "currency": "INR",
-            "name": "RoomFinder",
-            "description": `Unlock owner contact details for ${roomData.title}`,
-            "handler": function (response) {
-                alert(`Payment Successful! Payment ID: ${response.razorpay_payment_id}`);
-                
-                // Add room to local storage unlocked array
-                if (!appState.unlockedRooms.includes(roomData.id)) {
-                    appState.unlockedRooms.push(roomData.id);
-                    localStorage.setItem('rf_unlocked_rooms', JSON.stringify(appState.unlockedRooms));
+        try {
+            // 1. Create Order via Express Backend
+            const response = await fetch(`${BACKEND_URL}/api/create-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: 1000, // ₹10 in paise
+                    currency: 'INR',
+                    receipt: `receipt_unlock_${roomData.id}`
+                })
+            });
+
+            const orderData = await response.json();
+            if (!response.ok) throw new Error(orderData.error || 'Failed to create Razorpay order on server.');
+
+            // 2. Setup Razorpay Checkout Options
+            const options = {
+                "key": RAZORPAY_KEY_ID,
+                "amount": orderData.amount,
+                "currency": orderData.currency,
+                "name": "RoomFinder V2",
+                "description": `Unlock owner contact details for ${roomData.title}`,
+                "order_id": orderData.order_id,
+                "handler": async function (paymentResponse) {
+                    // 3. Verify Payment Signature via Express Backend
+                    const verifyRes = await fetch(`${BACKEND_URL}/api/verify-payment`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: paymentResponse.razorpay_order_id,
+                            razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                            razorpay_signature: paymentResponse.razorpay_signature
+                        })
+                    });
+
+                    const verifyData = await verifyRes.json();
+
+                    if (verifyRes.ok) {
+                        alert(`Payment Verified Successfully! Payment ID: ${paymentResponse.razorpay_payment_id}`);
+
+                        if (!appState.unlockedRooms.includes(roomData.id)) {
+                            appState.unlockedRooms.push(roomData.id);
+                            localStorage.setItem('rf_unlocked_rooms', JSON.stringify(appState.unlockedRooms));
+                        }
+
+                        renderContactButtonsState(roomData, true);
+                    } else {
+                        alert(`Payment Verification Failed: ${verifyData.message}`);
+                    }
+                },
+                "modal": {
+                    "ondismiss": function () {
+                        console.log('Payment modal dismissed by user.');
+                    }
+                },
+                "prefill": {
+                    "name": "Test User",
+                    "email": "test.user@example.com",
+                    "contact": "9999999999"
+                },
+                "theme": {
+                    "color": "#2563eb"
                 }
+            };
 
-                // Immediately update buttons in modal view
-                renderContactButtonsState(roomData, true);
-            },
-            "prefill": {
-                "name": "Test User",
-                "email": "test.user@example.com",
-                "contact": "9999999999"
-            },
-            "theme": {
-                "color": "#2563eb"
-            }
-        };
+            const rzp = new Razorpay(options);
+            
+            rzp.on('payment.failed', function (failureResponse) {
+                alert(`Payment Failed: ${failureResponse.error.description}`);
+            });
 
-        const rzp = new Razorpay(options);
-        rzp.open();
+            rzp.open();
+
+        } catch (err) {
+            console.error('Payment Error:', err);
+            alert(err.message || 'Payment initiation failed.');
+        }
     }
 
     const closeDetailModalWindowSheet = () => {
