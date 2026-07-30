@@ -7,14 +7,10 @@
     "gender": "Boys",
     "roomType": "Single",
     "available": true,
-
     "images": [
       "rooms/room1.jpg"
-      
     ],
-
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
-
     "amenities": [
       "Wi-Fi",
       "AC",
@@ -22,13 +18,9 @@
       "Washing Machine",
       "Housekeeping"
     ],
-
-  
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-07-01"
   },
-
   {
     "id": "room_002",
     "title": "Kasba Bawada",
@@ -36,16 +28,12 @@
     "city": "Ullpe Galli",
     "gender": "Girls",
     "roomType": "PG",
-
     "available": true,
-
     "images": [
       "rooms/room4.jpg",
       "rooms/room5.jpg"
     ],
-
     "description": "Comfortable and secure double-sharing PG accommodations.",
-
     "amenities": [
       "Wi-Fi",
       "Food Included",
@@ -53,13 +41,9 @@
       "Water Purifier",
       "Geyser"
     ],
-
-    
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-06-25"
   },
-
   {
     "id": "room_003",
     "title": "Kasba Bawada",
@@ -67,16 +51,11 @@
     "city": "Kolhapur",
     "gender": "Family",
     "roomType": "Flat",
-
     "available": true,
-
     "images": [
       "rooms/room6.jpg"
-      
     ],
-
-    "description": "Beautiful well ventilated 2BHK flat ideal for families Available pay 20 rs to get owner details.",
-
+    "description": "Beautiful well ventilated 2BHK flat ideal for families.",
     "amenities": [
       "Lift",
       "Car Parking",
@@ -84,12 +63,9 @@
       "Gym",
       "Gas Pipeline"
     ],
-
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-07-04"
   },
-
   {
     "id": "room_004",
     "title": "Kasba Bawada",
@@ -97,16 +73,11 @@
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Double",
-
     "available": true,
-
     "images": [
       "rooms/room12.jpg"
-     
     ],
-
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
-
     "amenities": [
       "Wi-Fi",
       "AC",
@@ -114,13 +85,9 @@
       "Washing Machine",
       "Housekeeping"
     ],
-
-  
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-07-01"
   },
-
   {
     "id": "room_005",
     "title": "Kasba Bawada",
@@ -128,16 +95,11 @@
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Double",
-
     "available": true,
-
     "images": [
       "rooms/room12.jpg"
-      
     ],
-
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
-
     "amenities": [
       "Wi-Fi",
       "AC",
@@ -145,29 +107,21 @@
       "Washing Machine",
       "Housekeeping"
     ],
-
-  
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-07-01"
   },
-{
+  {
     "id": "room_006",
     "title": "Kasba Bawada",
     "price": 2500,
     "city": "Kolhapur",
     "gender": "Girls",
     "roomType": "Single",
-
     "available": true,
-
     "images": [
       "rooms/room9.jpg"
-      
     ],
-
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
-
     "amenities": [
       "Wi-Fi",
       "AC",
@@ -175,13 +129,9 @@
       "Washing Machine",
       "Housekeeping"
     ],
-
-  
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-07-01"
   },
-
   {
     "id": "room_007",
     "title": "Kasba Bawada",
@@ -189,16 +139,11 @@
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Single",
-
     "available": true,
-
     "images": [
       "rooms/room10.jpg"
-      
     ],
-
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
-
     "amenities": [
       "Wi-Fi",
       "AC",
@@ -206,13 +151,9 @@
       "Washing Machine",
       "Housekeeping"
     ],
-
-  
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-07-01"
   },
-
   {
     "id": "room_008",
     "title": "Kasba Bawada",
@@ -220,16 +161,11 @@
     "city": "Kolhapur",
     "gender": "Boys",
     "roomType": "Single",
-
     "available": true,
-
     "images": [
       "rooms/room12.jpg"
-     
     ],
-
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
-
     "amenities": [
       "Wi-Fi",
       "AC",
@@ -237,13 +173,9 @@
       "Washing Machine",
       "Housekeeping"
     ],
-
-  
     "whatsapp": "917745036055",
-
     "dateAdded": "2026-07-01"
   },
-
   {
     "id": "room_009",
     "title": "Kasba Bawada",
@@ -251,27 +183,19 @@
     "city": "Kolhapur",
     "gender": "Girls",
     "roomType": "Single",
-
     "available": true,
-
     "images": [
       "rooms/room11.jpg"
-      
     ],
-
     "description": "A premium, fully furnished single room designed for corporate professionals and students.",
-
     "amenities": [
       "Wi-Fi",
-      "AB",
+      "AC",
       "Power Backup",
       "Washing Machine",
       "Housekeeping"
     ],
-
-  
     "whatsapp": "919579626809",
-
     "dateAdded": "2026-07-01"
   }
 ]
