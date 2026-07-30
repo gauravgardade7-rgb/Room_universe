@@ -404,8 +404,86 @@ document.addEventListener('DOMContentLoaded', () => {
     /* ==========================================================================
        6. MODAL OVERLAY DETAIL DISPLAY SHEET & RAZORPAY INTEGRATION
        ========================================================================== */
-    
-    // Inject Razorpay script if not already present
+    function openDetailModalSheetWindow(propertyId) {
+        const foundRoomDataRecord = appState.allRooms.find(r => r.id === propertyId);
+        if (!foundRoomDataRecord) return;
+
+        if (dom.modalMainImg) {
+            dom.modalMainImg.src = foundRoomDataRecord.images[0];
+            dom.modalMainImg.alt = foundRoomDataRecord.title;
+        }
+
+        if (dom.modalThumbnails) {
+            dom.modalThumbnails.innerHTML = '';
+            foundRoomDataRecord.images.forEach((imagePathString, dynamicIndexIndex) => {
+                const thumbnailImageNode = document.createElement('img');
+                thumbnailImageNode.src = imagePathString;
+                if (dynamicIndexIndex === 0) thumbnailImageNode.className = 'thumb-active';
+                thumbnailImageNode.addEventListener('click', () => {
+                    dom.modalMainImg.src = imagePathString;
+                    dom.modalThumbnails.querySelectorAll('img').forEach(t => t.classList.remove('thumb-active'));
+                    thumbnailImageNode.classList.add('thumb-active');
+                });
+                dom.modalThumbnails.appendChild(thumbnailImageNode);
+            });
+        }
+
+        if (dom.modalBadges) {
+            dom.modalBadges.innerHTML = `
+                <span class="badge-gender">${foundRoomDataRecord.gender} Profile</span>
+                <span class="badge-type">${foundRoomDataRecord.roomType} Allocation</span>
+            `;
+        }
+
+        if (dom.modalTitle) dom.modalTitle.textContent = foundRoomDataRecord.title;
+        if (dom.modalPrice) dom.modalPrice.textContent = foundRoomDataRecord.price;
+        if (dom.modalDesc) dom.modalDesc.textContent = foundRoomDataRecord.description;
+        
+        if (dom.modalAddress) {
+            const addressText = foundRoomDataRecord.address || foundRoomDataRecord.location || `${foundRoomDataRecord.city || 'Kasba Bawda'}, Kolhapur`;
+            dom.modalAddress.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${addressText}`;
+        }
+
+        if (dom.modalOwner) dom.modalOwner.textContent = foundRoomDataRecord.ownerName || 'Verified Host';
+
+        // Manage Unlocking State
+        const isUnlocked = appState.unlockedRooms.includes(propertyId);
+        renderContactButtonsState(foundRoomDataRecord, isUnlocked);
+
+        if (dom.modalMap) dom.modalMap.src = foundRoomDataRecord.mapEmbedUrl || '';
+
+        if (dom.detailModal) dom.detailModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function renderContactButtonsState(roomData, isUnlocked) {
+        if (!dom.btnCall || !dom.btnWhatsapp) return;
+
+        if (isUnlocked) {
+            const phoneNum = roomData.phone || roomData.contact || "9876543210";
+            const whatsappNum = roomData.whatsapp || roomData.phone || "919876543210";
+
+            dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${phoneNum}`;
+            dom.btnCall.onclick = () => window.location.href = `tel:${phoneNum}`;
+            
+            dom.btnWhatsapp.innerHTML = `<i class="fa-brands fa-whatsapp"></i> WhatsApp`;
+            dom.btnWhatsapp.onclick = () => window.open(`https://wa.me/${whatsappNum}?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(roomData.title)}`, '_blank');
+        } else {
+            dom.btnCall.innerHTML = `<i class="fa-solid fa-lock"></i> Unlock Call Info (₹10)`;
+            dom.btnCall.onclick = (e) => {
+                e.preventDefault();
+                initiateRazorpayPayment(roomData);
+            };
+
+            dom.btnWhatsapp.innerHTML = `<i class="fa-solid fa-lock"></i> Unlock WhatsApp (₹10)`;
+            dom.btnWhatsapp.onclick = (e) => {
+                e.preventDefault();
+                initiateRazorpayPayment(roomData);
+            };
+        }
+    }
+
+    // Inject Razorpay SDK dynamically if missing
     const loadRazorpaySDK = () => {
         return new Promise((resolve) => {
             if (window.Razorpay) {
@@ -428,3 +506,107 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
+            // 1. Request server to create Razorpay Order
+            const response = await fetch(`${BACKEND_URL}/api/create-order`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    amount: 1000, // ₹10 in paise
+                    currency: 'INR',
+                    receipt: `receipt_unlock_${roomData.id}`
+                })
+            });
+
+            const orderData = await response.json();
+            if (!response.ok) throw new Error(orderData.error || 'Failed to create payment order on server.');
+
+            // 2. Open Razorpay Checkout modal
+            const options = {
+                "key": RAZORPAY_KEY_ID,
+                "amount": orderData.amount,
+                "currency": orderData.currency,
+                "name": "RoomFinder V2",
+                "description": `Unlock owner contact details for ${roomData.title}`,
+                "order_id": orderData.order_id,
+                "handler": async function (paymentResponse) {
+                    // 3. Verify signature via Express backend
+                    const verifyRes = await fetch(`${BACKEND_URL}/api/verify-payment`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            razorpay_order_id: paymentResponse.razorpay_order_id,
+                            razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                            razorpay_signature: paymentResponse.razorpay_signature
+                        })
+                    });
+
+                    const verifyData = await verifyRes.json();
+
+                    if (verifyRes.ok) {
+                        alert(`Payment Verified Successfully! Payment ID: ${paymentResponse.razorpay_payment_id}`);
+
+                        if (!appState.unlockedRooms.includes(roomData.id)) {
+                            appState.unlockedRooms.push(roomData.id);
+                            localStorage.setItem('rf_unlocked_rooms', JSON.stringify(appState.unlockedRooms));
+                        }
+
+                        renderContactButtonsState(roomData, true);
+                    } else {
+                        alert(`Payment Verification Failed: ${verifyData.message}`);
+                    }
+                },
+                "modal": {
+                    "ondismiss": function () {
+                        console.log('Payment checkout closed.');
+                    }
+                },
+                "prefill": {
+                    "name": "RoomFinder User",
+                    "email": "user@roomfinder.com",
+                    "contact": "9999999999"
+                },
+                "theme": {
+                    "color": "#2563eb"
+                }
+            };
+
+            const rzp = new Razorpay(options);
+            
+            rzp.on('payment.failed', function (failureResponse) {
+                alert(`Payment Failed: ${failureResponse.error.description}`);
+            });
+
+            rzp.open();
+
+        } catch (err) {
+            console.error('Payment Error:', err);
+            alert(err.message || 'Payment initiation failed.');
+        }
+    };
+
+    const closeDetailModalWindowSheet = () => {
+        if (dom.detailModal) dom.detailModal.classList.add('hidden');
+        document.body.style.overflow = '';
+        if (dom.modalMap) dom.modalMap.src = '';
+    };
+
+    if (dom.modalClose) dom.modalClose.addEventListener('click', closeDetailModalWindowSheet);
+    if (dom.detailModal) {
+        dom.detailModal.addEventListener('click', (e) => { 
+            if (e.target === dom.detailModal) closeDetailModalWindowSheet(); 
+        });
+    }
+    
+    document.addEventListener('keydown', (e) => { 
+        if (e.key === 'Escape' && dom.detailModal && !dom.detailModal.classList.contains('hidden')) {
+            closeDetailModalWindowSheet(); 
+        }
+    });
+
+    /* ==========================================================================
+       7. INITIALIZATION PIPELINES
+       ========================================================================== */
+    initializeColorSchemeSystem();
+    loadPropertiesDataSource();
+    loadAdData();
+});
