@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 🔑 YOUR RAZORPAY TEST KEY ID (Fixed extra space):
     const RAZORPAY_KEY_ID = 'rzp_live_TJnZ1Lam93LZLX';
-    const BACKEND_URL = 'http://localhost:5000'; // Express Server Endpoint
+    const BACKEND_URL = 'https://your-deployed-backend-url.onrender.com'; // Express Server Endpoint
 
     // Global DOM Query Element Grid Context Register
     const dom = {
