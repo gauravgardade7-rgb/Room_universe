@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 🔑 RAZORPAY PRODUCTION KEYS & SERVER CONFIGURATION
     const RAZORPAY_KEY_ID = 'rzp_live_TJnZ1Lam93LZLX';
-    const BACKEND_URL = 'https://room-universe-backend.onrender.com'; // Express Server Endpoint on Render
+    const BACKEND_URL = 'https://room-universe.onrender.com'; // Express Server Endpoint on Render
 
     // Global DOM Query Element Grid Context Register
     const dom = {
