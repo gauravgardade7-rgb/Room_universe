@@ -464,8 +464,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!dom.btnCall || !dom.btnWhatsapp) return;
 
         if (isUnlocked) {
-            const phoneNum = roomData.phone || roomData.contact || "9876543210";
-            const whatsappNum = roomData.whatsapp || roomData.phone || "919876543210";
+            const phoneNum = roomData.phone || roomData.contact || "7745036055";
+            const whatsappNum = roomData.whatsapp || roomData.phone || "917745036055";
 
             dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${phoneNum}`;
             dom.btnCall.onclick = () => window.location.href = `tel:${phoneNum}`;
