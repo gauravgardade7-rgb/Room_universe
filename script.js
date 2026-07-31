@@ -559,8 +559,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!response.ok) throw new Error(orderData.error || 'Failed to create payment order on server.');
 
             // 2. Open Razorpay Checkout modal
+            // Use the key the backend just returned (tied to the same
+            // key_secret it used to create this order) instead of a
+            // separately hardcoded frontend constant, so the two can
+            // never silently drift out of sync.
             const options = {
-                "key": RAZORPAY_KEY_ID,
+                "key": orderData.key || RAZORPAY_KEY_ID,
                 "amount": orderData.amount, // Receives 1000 paise (₹10) from backend
                 "currency": orderData.currency,
                 "name": "RoomFinder V2",
