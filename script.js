@@ -464,8 +464,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!dom.btnCall || !dom.btnWhatsapp) return;
 
         if (isUnlocked) {
-            const phoneNum = roomData.phone || roomData.contact || "7745036055";
-            const whatsappNum = roomData.whatsapp || roomData.phone || "917745036055";
+            const phoneNum = roomData.phone || roomData.contact || "9876543210";
+            const whatsappNum = roomData.whatsapp || roomData.phone || "919876543210";
 
             dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${phoneNum}`;
             dom.btnCall.onclick = () => window.location.href = `tel:${phoneNum}`;
@@ -509,12 +509,8 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // Show UI loading feedback on buttons during Render cold start
-        if (dom.btnCall) dom.btnCall.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Gateway...`;
-        if (dom.btnWhatsapp) dom.btnWhatsapp.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Connecting to Gateway...`;
-
         try {
-            // 1. Request server to create Razorpay Order (Sends ₹10)
+            // 1. Request server to create Razorpay Order (Sends 10 Rupees)
             const response = await fetch(`${BACKEND_URL}/api/create-order`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -528,24 +524,17 @@ document.addEventListener('DOMContentLoaded', () => {
             const orderData = await response.json();
             if (!response.ok) throw new Error(orderData.error || 'Failed to create payment order on server.');
 
-            // Reset button text once order is prepared
-            renderContactButtonsState(roomData, false);
-
             // 2. Open Razorpay Checkout modal
             const options = {
                 "key": RAZORPAY_KEY_ID,
-                "amount": orderData.amount, // 1000 paise (₹10) from backend
+                "amount": orderData.amount, // Receives 1000 paise (₹10) from backend
                 "currency": orderData.currency,
                 "name": "RoomFinder V2",
                 "description": `Unlock owner contact details for ${roomData.title}`,
                 "order_id": orderData.order_id,
-                "handler": function (paymentResponse) {
-                    // Update UI button while verification is taking place
-                    if (dom.btnCall) dom.btnCall.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying Payment...`;
-                    if (dom.btnWhatsapp) dom.btnWhatsapp.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verifying Payment...`;
-
-                    // 3. Verify signature via Express backend (Promise chain prevents handler stalls)
-                    fetch(`${BACKEND_URL}/api/verify-payment`, {
+                "handler": async function (paymentResponse) {
+                    // 3. Verify signature via Express backend
+                    const verifyRes = await fetch(`${BACKEND_URL}/api/verify-payment`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -553,39 +542,32 @@ document.addEventListener('DOMContentLoaded', () => {
                             razorpay_payment_id: paymentResponse.razorpay_payment_id,
                             razorpay_signature: paymentResponse.razorpay_signature
                         })
-                    })
-                    .then(res => res.json().then(data => ({ status: res.status, ok: res.ok, data })))
-                    .then(({ ok, data }) => {
-                        if (ok) {
-                            alert(`Payment Verified Successfully! Payment ID: ${paymentResponse.razorpay_payment_id}`);
-
-                            if (!appState.unlockedRooms.includes(roomData.id)) {
-                                appState.unlockedRooms.push(roomData.id);
-                                localStorage.setItem('rf_unlocked_rooms', JSON.stringify(appState.unlockedRooms));
-                            }
-
-                            renderContactButtonsState(roomData, true);
-                        } else {
-                            alert(`Payment Verification Failed: ${data.message || 'Signature mismatch'}`);
-                            renderContactButtonsState(roomData, false);
-                        }
-                    })
-                    .catch(err => {
-                        console.error('Verification Error:', err);
-                        alert('Server verification failed. Payment ID: ' + paymentResponse.razorpay_payment_id);
-                        renderContactButtonsState(roomData, false);
                     });
+
+                    const verifyData = await verifyRes.json();
+
+                    if (verifyRes.ok) {
+                        alert(`Payment Verified Successfully! Payment ID: ${paymentResponse.razorpay_payment_id}`);
+
+                        if (!appState.unlockedRooms.includes(roomData.id)) {
+                            appState.unlockedRooms.push(roomData.id);
+                            localStorage.setItem('rf_unlocked_rooms', JSON.stringify(appState.unlockedRooms));
+                        }
+
+                        renderContactButtonsState(roomData, true);
+                    } else {
+                        alert(`Payment Verification Failed: ${verifyData.message}`);
+                    }
                 },
                 "modal": {
                     "ondismiss": function () {
                         console.log('Payment checkout closed.');
-                        renderContactButtonsState(roomData, false);
                     }
                 },
                 "prefill": {
                     "name": "RoomFinder User",
                     "email": "user@roomfinder.com",
-                    "contact": roomData.phone || "7745036055"
+                    "contact": "9999999999"
                 },
                 "theme": {
                     "color": "#2563eb"
@@ -596,7 +578,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             rzp.on('payment.failed', function (failureResponse) {
                 alert(`Payment Failed: ${failureResponse.error.description}`);
-                renderContactButtonsState(roomData, false);
             });
 
             rzp.open();
@@ -604,7 +585,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error('Payment Error:', err);
             alert(err.message || 'Payment initiation failed.');
-            renderContactButtonsState(roomData, false);
         }
     };
 
