@@ -21,6 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const RAZORPAY_KEY_ID = 'rzp_live_TJoAyneYfwWlGl';
     const BACKEND_URL = 'https://room-universe.onrender.com'; // Express Server Endpoint on Render
 
+    // Guards against duplicate/concurrent Razorpay checkout instances
+    // (prevents double-clicks or leftover instances from opening two
+    // parallel checkouts, which doubles Razorpay's status polling and
+    // can trigger a 429 rate-limit response)
+    let isPaymentInProgress = false;
+    let activeRzpInstance = null;
+
     // Global DOM Query Element Grid Context Register
     const dom = {
         loader: document.getElementById('app-loader'),
@@ -467,6 +474,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const phoneNum = roomData.phone || roomData.contact || "9876543210";
             const whatsappNum = roomData.whatsapp || roomData.phone || "919876543210";
 
+            dom.btnCall.classList.remove('is-processing');
+            dom.btnWhatsapp.classList.remove('is-processing');
+
             dom.btnCall.innerHTML = `<i class="fa-solid fa-phone"></i> Call ${phoneNum}`;
             dom.btnCall.onclick = () => window.location.href = `tel:${phoneNum}`;
             
@@ -502,14 +512,38 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    // Visually locks the unlock buttons while a checkout/payment is active,
+    // so a second click (or a leftover handler) can't spin up a second
+    // Razorpay instance in parallel.
+    function setPaymentButtonsProcessing(isProcessing) {
+        [dom.btnCall, dom.btnWhatsapp].forEach(btn => {
+            if (!btn) return;
+            btn.classList.toggle('is-processing', isProcessing);
+            btn.style.pointerEvents = isProcessing ? 'none' : '';
+            btn.style.opacity = isProcessing ? '0.6' : '';
+        });
+    }
+
     const initiateRazorpayPayment = async (roomData) => {
-        const isSDKLoaded = await loadRazorpaySDK();
-        if (!isSDKLoaded) {
-            alert('Razorpay Gateway SDK failed to load. Please check your network connection.');
-            return;
+        // Guard: block re-entry while a checkout is already open/in-flight
+        if (isPaymentInProgress) return;
+
+        // Guard: if a previous Razorpay instance is somehow still around, close it first
+        if (activeRzpInstance) {
+            try { activeRzpInstance.close(); } catch (e) { /* no-op */ }
+            activeRzpInstance = null;
         }
 
+        isPaymentInProgress = true;
+        setPaymentButtonsProcessing(true);
+
         try {
+            const isSDKLoaded = await loadRazorpaySDK();
+            if (!isSDKLoaded) {
+                alert('Razorpay Gateway SDK failed to load. Please check your network connection.');
+                return;
+            }
+
             // 1. Request server to create Razorpay Order (Sends 10 Rupees)
             const response = await fetch(`${BACKEND_URL}/api/create-order`, {
                 method: 'POST',
@@ -558,10 +592,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     } else {
                         alert(`Payment Verification Failed: ${verifyData.message}`);
                     }
+
+                    activeRzpInstance = null;
+                    isPaymentInProgress = false;
+                    setPaymentButtonsProcessing(false);
                 },
                 "modal": {
                     "ondismiss": function () {
                         console.log('Payment checkout closed.');
+                        activeRzpInstance = null;
+                        isPaymentInProgress = false;
+                        setPaymentButtonsProcessing(false);
                     }
                 },
                 "prefill": {
@@ -575,9 +616,13 @@ document.addEventListener('DOMContentLoaded', () => {
             };
 
             const rzp = new Razorpay(options);
-            
+            activeRzpInstance = rzp;
+
             rzp.on('payment.failed', function (failureResponse) {
                 alert(`Payment Failed: ${failureResponse.error.description}`);
+                activeRzpInstance = null;
+                isPaymentInProgress = false;
+                setPaymentButtonsProcessing(false);
             });
 
             rzp.open();
@@ -585,6 +630,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) {
             console.error('Payment Error:', err);
             alert(err.message || 'Payment initiation failed.');
+            isPaymentInProgress = false;
+            setPaymentButtonsProcessing(false);
         }
     };
 
