@@ -6,89 +6,266 @@ require('dotenv').config();
 
 const app = express();
 
-// 1. CORS Configuration for GitHub Pages Cross-Origin Requests
+/* ==========================================================
+   Validate Environment Variables
+========================================================== */
+
+if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+    console.error("❌ Razorpay Environment Variables Missing!");
+    process.exit(1);
+}
+
+/* ==========================================================
+   CORS
+========================================================== */
+
 app.use(cors({
-  origin: ['https://gauravgardade7-rgb.github.io', 'http://localhost:5500', 'http://127.0.0.1:5500'],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
+    origin: [
+        'https://gauravgardade7-rgb.github.io',
+        'http://localhost:5500',
+        'http://127.0.0.1:5500'
+    ],
+    methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
 
-// 2. Initialize Razorpay Instance with Environment Variables
+/* ==========================================================
+   Razorpay Instance
+========================================================== */
+
 const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET,
+    key_id: process.env.RAZORPAY_KEY_ID,
+    key_secret: process.env.RAZORPAY_KEY_SECRET
 });
 
-// Root Health-Check Endpoint
+/* ==========================================================
+   Health Check
+========================================================== */
+
 app.get('/', (req, res) => {
-  res.status(200).json({ status: 'active', message: 'RoomFinder Backend Operational' });
+
+    res.json({
+        status: "active",
+        server: "RoomFinder Backend",
+        razorpay: "Connected",
+        time: new Date().toISOString()
+    });
+
 });
 
-// Endpoint 1: Create Razorpay Order
+/* ==========================================================
+   Create Order
+========================================================== */
+
 app.post('/api/create-order', async (req, res) => {
-  try {
-    // Default amount set to 10 Rupees
-    const { amount = 10, currency = 'INR', receipt } = req.body; 
 
-    // Convert Rupees to Paise (₹10 * 100 = 1000 paise)
-    const amountInPaise = Math.round(Number(amount) * 100);
+    try {
 
-    if (isNaN(amountInPaise) || amountInPaise < 100) {
-      return res.status(400).json({ error: 'Amount must be at least ₹1 (100 paise)' });
+        console.log("======================================");
+        console.log("📦 CREATE ORDER REQUEST");
+        console.log(req.body);
+
+        const {
+            amount = 10,
+            currency = "INR",
+            receipt
+        } = req.body;
+
+        const amountInPaise = Math.round(Number(amount) * 100);
+
+        if (isNaN(amountInPaise) || amountInPaise < 100) {
+
+            return res.status(400).json({
+                success: false,
+                error: "Invalid Amount"
+            });
+
+        }
+
+        const order = await razorpay.orders.create({
+
+            amount: amountInPaise,
+            currency,
+            receipt: receipt || `receipt_${Date.now()}`
+
+        });
+
+        console.log("✅ ORDER CREATED");
+        console.log(order);
+
+        res.json({
+
+            success: true,
+            order_id: order.id,
+            amount: order.amount,
+            currency: order.currency,
+            key: process.env.RAZORPAY_KEY_ID
+
+        });
+
     }
 
-    const options = {
-      amount: amountInPaise, // 1000 paise = ₹10
-      currency,
-      receipt: receipt || `receipt_${Date.now()}`,
-    };
+    catch (err) {
 
-    const order = await razorpay.orders.create(options);
+        console.error("❌ CREATE ORDER ERROR");
+        console.error(err);
 
-    return res.status(200).json({
-      id: order.id,
-      order_id: order.id,
-      amount: order.amount,
-      currency: order.currency,
-      key: process.env.RAZORPAY_KEY_ID
-    });
-  } catch (error) {
-    console.error('Create Order Backend Error:', error);
-    return res.status(500).json({ 
-      error: 'Failed to create Razorpay order', 
-      details: error.message || error 
-    });
-  }
+        res.status(500).json({
+
+            success: false,
+            error: err.message
+
+        });
+
+    }
+
 });
 
-// Endpoint 2: Verify Payment Signature
+/* ==========================================================
+   Verify Payment
+========================================================== */
+
 app.post('/api/verify-payment', (req, res) => {
-  try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
-      return res.status(400).json({ error: 'Missing required payment verification parameters' });
+    try {
+
+        console.log("======================================");
+        console.log("💳 VERIFY PAYMENT REQUEST");
+        console.log(req.body);
+
+        const {
+
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature
+
+        } = req.body;
+
+        if (
+            !razorpay_order_id ||
+            !razorpay_payment_id ||
+            !razorpay_signature
+        ) {
+
+            return res.status(400).json({
+
+                success: false,
+                message: "Missing Parameters"
+
+            });
+
+        }
+
+        const generatedSignature = crypto
+            .createHmac(
+                "sha256",
+                process.env.RAZORPAY_KEY_SECRET
+            )
+            .update(
+                razorpay_order_id + "|" + razorpay_payment_id
+            )
+            .digest("hex");
+
+        console.log("Generated Signature:");
+        console.log(generatedSignature);
+
+        console.log("Received Signature:");
+        console.log(razorpay_signature);
+
+        if (generatedSignature === razorpay_signature) {
+
+            console.log("✅ PAYMENT VERIFIED SUCCESSFULLY");
+
+            return res.json({
+
+                success: true,
+                message: "Payment Verified",
+
+                payment: {
+
+                    payment_id: razorpay_payment_id,
+                    order_id: razorpay_order_id
+
+                }
+
+            });
+
+        }
+
+        console.log("❌ SIGNATURE MISMATCH");
+
+        return res.status(400).json({
+
+            success: false,
+            message: "Invalid Signature"
+
+        });
+
     }
 
-    const generatedSignature = crypto
-      .createHmac('sha256', process.env.RAZORPAY_KEY_SECRET)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-      .digest('hex');
+    catch (err) {
 
-    if (generatedSignature === razorpay_signature) {
-      return res.status(200).json({ status: 'success', message: 'Payment verified successfully' });
-    } else {
-      return res.status(400).json({ status: 'failure', message: 'Invalid payment signature' });
+        console.error("❌ VERIFY PAYMENT ERROR");
+        console.error(err);
+
+        return res.status(500).json({
+
+            success: false,
+            message: err.message
+
+        });
+
     }
-  } catch (error) {
-    console.error('Verify Payment Error:', error);
-    return res.status(500).json({ error: 'Payment verification failed' });
-  }
+
 });
 
-// Start Server Listening on Dynamic Render Port
+/* ==========================================================
+   404
+========================================================== */
+
+app.use((req, res) => {
+
+    res.status(404).json({
+
+        success: false,
+        message: "API Not Found"
+
+    });
+
+});
+
+/* ==========================================================
+   Global Error Handler
+========================================================== */
+
+app.use((err, req, res, next) => {
+
+    console.error(err);
+
+    res.status(500).json({
+
+        success: false,
+        message: "Internal Server Error"
+
+    });
+
+});
+
+/* ==========================================================
+   Start Server
+========================================================== */
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
+
+app.listen(PORT, () => {
+
+    console.log("====================================");
+    console.log("🚀 RoomFinder Backend Started");
+    console.log("Port :", PORT);
+    console.log("Key  :", process.env.RAZORPAY_KEY_ID);
+    console.log("====================================");
+
+});
